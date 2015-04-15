@@ -1,0 +1,30 @@
+language: python
+python:
+- '2.7'
+install:
+- pip install -e .
+- pip install coveralls
+- pip install sure
+- pip install py-inspector
+script:
+- rm -rf .coverage
+- make test
+after_success:
+- coveralls
+deploy:
+  provider: pypi
+  user: lojaintegrada
+  on:
+    tags: true
+    repo: lojaintegrada/LI-Pagador-MercadoPago-Transparente
+    all_branches: true
+notifications:
+  email:
+    recipients:
+    - contato@awsli.com.br
+    - marcio.duarte@lojaintegrada.com.br
+  hipchat:
+    rooms:
+    template:
+      - '%{result} - %{repository_name}#%{build_number} (%{branch} - %{commit} : %{author}) (<a href="%{build_url}">Detalhes</a>/<a href="%{compare_url}">Altera&ccedil;&otilde;es</a>)'
+    format: html
