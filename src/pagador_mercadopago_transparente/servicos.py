@@ -143,15 +143,15 @@ MENSAGENS_RETORNO = {
     'cc_rejected_bad_filled_other': u'Uma ou mais informações enviadas estão inválidas.',
     'cc_rejected_bad_filled_security_code': u'O código de segurança é inválido.',
     'cc_rejected_blacklist': u'Não foi possível processar o pagamento.',
-    'cc_rejected_call_for_authorize': u'Você precisa autorizar',
-    'cc_rejected_card_disabled': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-    'cc_rejected_card_error': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-    'cc_rejected_duplicated_payment': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-    'cc_rejected_high_risk': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-    'cc_rejected_insufficient_amount': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-    'cc_rejected_invalid_installments': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-    'cc_rejected_max_attempts': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-    'cc_rejected_other_reason': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
+    'cc_rejected_call_for_authorize': u'Você precisa autorizar o MercadoPago junto a operadora do cartão.',
+    'cc_rejected_card_disabled': u'O cartão usado precisa ser habilitado com a operadora.',
+    'cc_rejected_card_error': u'Não foi possível processar o pagamento.',
+    'cc_rejected_duplicated_payment': u'Você já fez um pagamento desse valor. Se você precisa pagar novamente use outro cartão ou outro meio de pagamento.',
+    'cc_rejected_high_risk': u'O seu pagamento foi recusado.',
+    'cc_rejected_insufficient_amount': u'O cartão usado não tem saldo suficiente.',
+    'cc_rejected_invalid_installments': u'O cartão usado não aceita as parcelas selecionadas.',
+    'cc_rejected_max_attempts': u'Você atingiu o limite de tentativas permitidas. Use outro cartão ou um outro meio de pagamento.',
+    'cc_rejected_other_reason': u'A operadora do cartão não processou o pagamento.',
 }
 
 
@@ -206,14 +206,14 @@ class EntregaPagamento(servicos.EntregaPagamento):
                     'valor_parcela': float(self.resposta.conteudo['installment_amount'])
                 })
             self.situacao_pedido = SituacoesDePagamento.do_tipo(self.resposta.conteudo['status'])
-            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': MENSAGENS_RETORNO.get(self.resposta.conteudo['status'], u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')}
+            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')}
         if self.resposta.requisicao_invalida:
             raise self.EnvioNaoRealizado(
                 u'Dados inválidos enviados ao MercadoPago',
                 self.loja_id,
                 self.pedido.numero,
                 dados_envio=self.malote.to_dict(),
-                erros=[u'{}: {}'.format(causa['code'], MENSAGENS_RETORNO[str(causa['code'])]) for causa in self.resposta.conteudo.get('cause', [])]
+                erros=[u'{}: {}'.format(causa['code'], MENSAGENS_RETORNO.get(str(causa['code']), u'Erro não identificado.')) for causa in self.resposta.conteudo.get('cause', [])]
             )
 
     @property
@@ -224,21 +224,8 @@ class EntregaPagamento(servicos.EntregaPagamento):
 
 class SituacoesDePagamento(servicos.SituacoesDePagamento):
     DE_PARA = {
-        'accredited': servicos.SituacaoPedido.SITUACAO_PEDIDO_PAGO,
-        'pending_contingency': servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE,
-        'pending_review_manual': servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE,
-        'cc_rejected_bad_filled_card_number': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_bad_filled_date': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_bad_filled_other': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_bad_filled_security_code': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_blacklist': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_call_for_authorize': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_card_disabled': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_card_error': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_duplicated_payment': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_high_risk': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_insufficient_amount': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_invalid_installments': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_max_attempts': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
-        'cc_rejected_other_reason': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
+        'approved': servicos.SituacaoPedido.SITUACAO_PEDIDO_PAGO,
+        'pending': servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE,
+        'in_process': servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE,
+        'rejected': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
     }
