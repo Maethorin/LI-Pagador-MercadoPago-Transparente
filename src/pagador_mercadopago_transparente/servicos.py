@@ -7,8 +7,6 @@ from li_common.comunicacao import requisicao
 from pagador import settings, servicos
 
 
-
-
 class TipoToken(object):
     authorization_code = 'authorization_code'
     refresh_token = 'refresh_token'
@@ -35,7 +33,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         dados = {
             'response_type': 'code',
             'client_id': self.client_id,
-            'redirect_uri': '{}?{}'.format(settings.MERCADOPAGO_REDIRECT_URL.format(self.loja_id), parametros_redirect)
+            'redirect_uri': '{}?{}'.format(settings.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
         }
         return 'http://auth.mercadolivre.com.br/authorization?{}'.format(urlencode(dados))
 
@@ -57,7 +55,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
             'grant_type': TipoToken.authorization_code,
             'client_id': self.client_id,
             'client_secret': self.client_secret,
-            'redirect_uri': '{}?{}'.format(settings.MERCADOPAGO_REDIRECT_URL.format(self.loja_id), parametros_redirect)
+            'redirect_uri': '{}?{}'.format(settings.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
         }
 
     @property
@@ -106,12 +104,19 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
 class Credenciador(servicos.Credenciador):
     def __init__(self, tipo=None, configuracao=None):
         super(Credenciador, self).__init__(tipo, configuracao)
-        self.tipo = self.TipoAutenticacao.form_urlencode
-        self.chave_api = str(getattr(self.configuracao, 'token', ''))
-        self.chave = 'api_key'
+        self.tipo = self.TipoAutenticacao.query_string
+        self.access_token = None
+        self.refresh_token = None
+        self.token_expiracao = None
+        self.atualiza_credenciais()
+
+    def atualiza_credenciais(self):
+        self.access_token = getattr(self.configuracao, 'token', '')
+        self.refresh_token = getattr(self.configuracao, 'codigo_autorizacao', '')
+        self.token_expiracao = getattr(self.configuracao, 'token_expiracao', datetime.utcnow())
 
     def obter_credenciais(self):
-        return self.chave_api
+        return self.access_token
 
 
 MENSAGENS_RETORNO = {
@@ -213,7 +218,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
                 self.loja_id,
                 self.pedido.numero,
                 dados_envio=self.malote.to_dict(),
-                erros=[u'{}: {}'.format(causa['code'], MENSAGENS_RETORNO.get(str(causa['code']), u'Erro não identificado.')) for causa in self.resposta.conteudo.get('cause', [])]
+                erros=[u'{}: {}'.format(causa['code'], MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
             )
 
     @property

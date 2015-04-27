@@ -25,42 +25,23 @@ class Telefone(entidades.BaseParaPropriedade):
 class Malote(entidades.Malote):
     def __init__(self, configuracao):
         super(Malote, self).__init__(configuracao)
-        self.installments = None
-        self.free_installments = None
-        self.payment_method = 'credit_card'
-        self.capture = 'false'
-        self.amount = None
-        self.card_hash = None
-        self.customer = None
-        self.metadata = None
+        self.amount = 0
+        self.reason = None
+        self.currency_id = 'BRL'
+        self.installments = 1
+        self.payment_method_id = None
+        self.card_token_id = None
+        self.payer_email = None
+        self.external_reference = None
 
     def monta_conteudo(self, pedido, parametros_contrato=None, dados=None):
         self.amount = self.formatador.formata_decimal(pedido.valor_total, em_centavos=True)
-        self.card_hash = dados['cartao_hash']
-        parcelas = dados.get('cartao_parcelas', 1)
-        if dados.get('cartao_parcelas_sem_juros', None) == 'true':
-            self.free_installments = parcelas
-            self.remove_atributo_da_serializacao('installments')
-        else:
-            self.installments = parcelas
-            self.remove_atributo_da_serializacao('free_installments')
-        self.customer = Cliente(
-            name=pedido.cliente['nome'],
-            document_number=pedido.cliente_documento,
-            email=pedido.cliente['email'],
-            address=Endereco(
-                street=pedido.endereco_cliente['endereco'],
-                street_number=pedido.endereco_cliente['numero'],
-                complementary=pedido.endereco_cliente['complemento'],
-                neighborhood=pedido.endereco_cliente['bairro'],
-                zipcode=pedido.endereco_cliente['cep'],
-            ),
-            phone=Telefone(ddd=pedido.cliente_telefone[0], number=pedido.cliente_telefone[1])
-        )
-        self.metadata = {
-            'pedido_numero': pedido.numero,
-            'carrinho': [item.to_dict() for item in pedido.itens]
-        }
+        self.reason = 'Pagamento do pedido {} na Loja {}'.format(pedido.numero, pedido.conteudo_json['mptransparente']['nome_loja'])
+        self.installments = pedido.conteudo_json.get('parcelas', 1)
+        self.payment_method_id = pedido.conteudo_json['mptransparente']['bandeira']
+        self.card_token_id = pedido.conteudo_json['mptransparente']['cartao_token']
+        self.payer_email = pedido.cliente['email']
+        self.external_reference = pedido.numero
 
 
 class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
@@ -70,6 +51,15 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
         self.codigo_gateway = CODIGO_GATEWAY
         self.eh_gateway = True
         super(ConfiguracaoMeioPagamento, self).__init__(loja_id, codigo_pagamento, eh_listagem=eh_listagem)
-        self.src_js_sdk = 'https://secure.mlstatic.com/org-img/checkout/custom/1.0/checkout.j'
+        self.src_js_sdk = 'https://secure.mlstatic.com/org-img/checkout/custom/1.0/checkout.js'
         if not self.eh_listagem:
             self.formulario = cadastro.FormularioMercadoPagoTransparente()
+            self.eh_aplicacao = True
+
+    @property
+    def configurado(self):
+        return (
+            self.usuario is not None and
+            self.token is not None and
+            self.codigo_autorizacao is not None
+        )
