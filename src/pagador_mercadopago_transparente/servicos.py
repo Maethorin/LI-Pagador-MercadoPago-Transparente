@@ -207,8 +207,8 @@ class EntregaPagamento(servicos.EntregaPagamento):
             }
             if self.tem_parcelas:
                 self.dados_pagamento['conteudo_json'].update({
-                    'numero_parcelas': int(self.resposta.conteudo['installments']),
-                    'valor_parcela': float(self.resposta.conteudo['installment_amount'])
+                    'numero_parcelas': int(self.resposta.conteudo.get('installments', 1)),
+                    'valor_parcela': float(self.resposta.conteudo.get('installment_amount', self.resposta.conteudo['amount']))
                 })
             self.situacao_pedido = SituacoesDePagamento.do_tipo(self.resposta.conteudo['status'])
             self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')}

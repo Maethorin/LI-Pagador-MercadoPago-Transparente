@@ -57,7 +57,7 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
             self.eh_aplicacao = True
 
     @property
-    def configurado(self):
+    def instalado(self):
         return (
             self.usuario is not None and
             self.token is not None and

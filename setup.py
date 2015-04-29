@@ -32,9 +32,9 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name='li-pagador-mercadopago_transparente',
-    version='0.0.7',
-    url='https://github.com/lojaintegrada/LI-Pagador-MercadoPagoTransparente',
+    name='li-pagador-mercadopago-transparente',
+    version='0.0.2',
+    url='https://github.com/lojaintegrada/LI-Pagador-MercadoPago-Transparente',
     license='MIT',
     description='Meio de pagamento usando o checkout transparente do MercadoPago (http://developers.mercadopago.com/documentation/custom-checkout-advanced)',
     author=u'Loja Integrada',
