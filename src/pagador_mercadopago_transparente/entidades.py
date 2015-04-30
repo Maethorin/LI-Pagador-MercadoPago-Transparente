@@ -35,7 +35,7 @@ class Malote(entidades.Malote):
         self.external_reference = None
 
     def monta_conteudo(self, pedido, parametros_contrato=None, dados=None):
-        self.amount = self.formatador.formata_decimal(pedido.valor_total, em_centavos=True)
+        self.amount = self.formatador.formata_decimal(pedido.valor_total, como_float=True)
         self.reason = 'Pagamento do pedido {} na Loja {}'.format(pedido.numero, pedido.conteudo_json['mptransparente']['nome_loja'])
         self.installments = pedido.conteudo_json.get('parcelas', 1)
         self.payment_method_id = pedido.conteudo_json['mptransparente']['bandeira']

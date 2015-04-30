@@ -165,7 +165,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
         super(EntregaPagamento, self).__init__(loja_id, plano_indice, dados=dados)
         self.tem_malote = True
         self.faz_http = True
-        self.conexao = self.obter_conexao(formato_envio=requisicao.Formato.form_urlencode)
+        self.conexao = self.obter_conexao()
         self.url = 'https://api.mercadolibre.com/checkout/custom/create_payment'
         self.tentativa = 1
         self.tentativa_maxima = 2
