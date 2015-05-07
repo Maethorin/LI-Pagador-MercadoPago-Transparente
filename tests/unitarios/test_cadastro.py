@@ -15,18 +15,6 @@ class FormularioMPTransparente(unittest.TestCase):
         self.formulario.ativo.label.should.be.equal('Pagamento ativo?')
         self.formulario.ativo.tipo.should.be.equal(cadastro.cadastro.TipoDeCampo.boleano)
 
-    def test_deve_ter_public_key(self):
-        self.formulario.public_key.nome.should.be.equal('assinatura')
-        self.formulario.public_key.ordem.should.be.equal(2)
-        self.formulario.public_key.label.should.be.equal(u'Public Key')
-        self.formulario.public_key.tipo.should.be.equal(cadastro.cadastro.TipoDeCampo.texto)
-
-    # def test_deve_ter_juros_valor(self):
-    #     self.formulario.juros_valor.nome.should.be.equal('juros_valor')
-    #     self.formulario.juros_valor.ordem.should.be.equal(6)
-    #     self.formulario.juros_valor.label.should.be.equal(u'Taxa de Juros')
-    #     self.formulario.juros_valor.tipo.should.be.equal(cadastro.cadastro.TipoDeCampo.decimal)
-
     def test_deve_ter_valor_minimo_aceitado(self):
         self.formulario.valor_minimo_aceitado.nome.should.be.equal('valor_minimo_aceitado')
         self.formulario.valor_minimo_aceitado.ordem.should.be.equal(3)

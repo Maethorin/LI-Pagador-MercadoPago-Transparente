@@ -195,23 +195,23 @@ class EntregaPagamento(servicos.EntregaPagamento):
 
     def processa_dados_pagamento(self):
         if self.resposta.sucesso:
+            mensagem_retorno = MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
             self.dados_pagamento = {
                 'transacao_id': self.resposta.conteudo['payment_id'],
-                'valor_pago': self.resposta.conteudo['amount']
-            }
-            self.identificacao_pagamento = self.resposta.conteudo['payment_id']
-            self.dados_pagamento = {
+                'valor_pago': self.resposta.conteudo['amount'],
                 'conteudo_json': {
-                    'bandeira': self.resposta.conteudo['payment_method_id']
+                    'bandeira': self.resposta.conteudo['payment_method_id'],
+                    'mensagem_retorno': mensagem_retorno
                 }
             }
+            self.identificacao_pagamento = self.resposta.conteudo['payment_id']
             if self.tem_parcelas:
                 self.dados_pagamento['conteudo_json'].update({
                     'numero_parcelas': int(self.resposta.conteudo.get('installments', 1)),
                     'valor_parcela': float(self.resposta.conteudo.get('installment_amount', self.resposta.conteudo['amount']))
                 })
             self.situacao_pedido = SituacoesDePagamento.do_tipo(self.resposta.conteudo['status'])
-            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')}
+            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
         if self.resposta.requisicao_invalida:
             raise self.EnvioNaoRealizado(
                 u'Dados inválidos enviados ao MercadoPago',

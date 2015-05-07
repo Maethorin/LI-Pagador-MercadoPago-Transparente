@@ -103,8 +103,9 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.tem_parcelas.should.be.falsy
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
-    def test_pre_envio_nao_tem_parcelas_comm_cartao_parcelas_igual_a_um(self):
+    def test_pre_envio_nao_tem_parcelas_com_cartao_parcelas_igual_a_um(self):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre', 'cartao_parcelas': 1})
+
         entregador.tem_parcelas.should.be.falsy
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
