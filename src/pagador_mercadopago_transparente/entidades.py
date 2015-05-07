@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pagador import entidades
+from pagador import settings, entidades
 from pagador_mercadopago_transparente import cadastro
 
 CODIGO_GATEWAY = 14
@@ -34,6 +34,7 @@ class Malote(entidades.Malote):
         self.card_token_id = None
         self.payer_email = None
         self.external_reference = None
+        self.notification_url = None
 
     def monta_conteudo(self, pedido, parametros_contrato=None, dados=None):
         self.amount = self.formatador.formata_decimal(pedido.valor_total, como_float=True)
@@ -46,6 +47,8 @@ class Malote(entidades.Malote):
         self.card_token_id = dados_pagamento['cartao_token']
         self.payer_email = pedido.cliente['email']
         self.external_reference = pedido.numero
+        notification_url = settings.NOTIFICACAO_URL.format(self.configuracao.loja_id, GATEWAY)
+        self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
 
 
 class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):

@@ -233,4 +233,101 @@ class SituacoesDePagamento(servicos.SituacoesDePagamento):
         'pending': servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE,
         'in_process': servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE,
         'rejected': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
+        'in_mediation': servicos.SituacaoPedido.SITUACAO_PAGTO_EM_DISPUTA,
+        'refunded': servicos.SituacaoPedido.SITUACAO_PAGTO_DEVOLVIDO,
+        'cancelled': servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
+        'charged_back': servicos.SituacaoPedido.SITUACAO_PAGTO_CHARGEBACK
     }
+
+
+class Retorno(object):
+    pagamento = 'payment'
+    ordem_pagamento = 'merchant_order'
+
+    def __init__(self, dados):
+        self.dados_retorno = {}
+        self.topico = dados.get('topic', None)
+        self.eh_pagamento = self.topico == self.pagamento
+        self.eh_ordem_pagamento = self.topico == self.ordem_pagamento
+        self.valido = 'id' in dados and 'topic' in dados and (self.eh_ordem_pagamento or self.eh_pagamento)
+        self.chave = 'collection' if self.eh_pagamento else 'payments'
+
+    def recebe_dados_de_retorno(self, dados):
+        self.dados_retorno = dados
+
+    @property
+    def dados(self):
+        try:
+            if self.eh_pagamento:
+                return self.dados_retorno[self.chave]
+            if self.eh_ordem_pagamento:
+                    return self.dados_retorno[self.chave][0]
+        except (IndexError, KeyError):
+            return {}
+
+
+class RegistraNotificacao(servicos.RegistraResultado):
+    def __init__(self, loja_id, dados=None):
+        super(RegistraNotificacao, self).__init__(loja_id, dados)
+        self.conexao = self.obter_conexao()
+        self.retorno = Retorno(dados)
+        self.faz_http = True
+        self.tentativa = 1
+        self.tentativa_maxima = 2
+
+    def define_credenciais(self):
+        self.conexao.credenciador = Credenciador(configuracao=self.configuracao)
+
+    def monta_dados_pagamento(self):
+        if self.resposta and self.resposta.sucesso:
+            self.retorno.recebe_dados_de_retorno(self.resposta.conteudo)
+            if not self.retorno.valido:
+                self.resultado = {'resultado': 'erro', 'status_code': self.resposta.status_code, 'conteudo': self.resposta.conteudo}
+                return
+            self.pedido_numero = self.dados.get('referencia', None) or self.retorno.dados['external_reference']
+            self.dados_pagamento = {
+                'transacao_id': self.dados['id']
+            }
+            if 'total_paid_amount' in self.retorno.dados:
+                self.dados_pagamento['valor_pago'] = self.retorno.dados['total_paid_amount']
+            self.situacao_pedido = SituacoesDePagamento.do_tipo(self.retorno.dados.get('status', ''))
+            self.resultado = {'resultado': 'OK'}
+        elif self.resposta and (self.resposta.nao_autenticado or self.resposta.nao_autorizado):
+            self.reenviar = self.tentativa <= self.tentativa_maxima and (
+                self.resposta.conteudo.get('message', '') in ['expired_token', 'invalid_token'] or
+                self.resposta.conteudo.get('error', '') == 'invalid_access_token'
+            )
+            if self.reenviar:
+                self.reenviando()
+            else:
+                self.resultado = {'resultado': 'nao autorizado', 'conteudo': self.resposta.conteudo}
+        elif self.resposta:
+            self.resultado = {'resultado': 'erro', 'status_code': self.resposta.status_code, 'conteudo': self.resposta.conteudo}
+        else:
+            self.resultado = {'resultado': 'erro', 'status_code': 500, 'conteudo': u'MercadoPago não retornou uma resposta válida'}
+
+    def reenviando(self):
+        self.tentativa += 1
+        self.obtem_informacoes_pagamento()
+        self.monta_dados_pagamento()
+
+    def atualiza_credenciais(self):
+        self.configuracao.instalar({'fase_atual': '2', 'tipo': 'atualizar', 'codigo_autorizacao': self.configuracao.codigo_autorizacao})
+        self.conexao.credenciador.configuracao = self.configuracao
+        self.conexao.credenciador.atualiza_credenciais()
+
+    def obtem_informacoes_pagamento(self):
+        if not self.retorno.valido:
+            return
+        if self.tentativa > 1:
+            self.atualiza_credenciais()
+        self.resposta = self.conexao.get(self.url)
+
+    @property
+    def url(self):
+        if not self.retorno.valido:
+            return ''
+        if self.retorno.topico == Retorno.pagamento:
+            return 'https://api.mercadolibre.com/collections/notifications/{}'.format(self.dados['id'])
+        if self.retorno.topico == Retorno.ordem_pagamento:
+            return self.dados.get('resource', 'https://api.mercadolibre.com/merchant_orders/{}'.format(self.dados['id']))
