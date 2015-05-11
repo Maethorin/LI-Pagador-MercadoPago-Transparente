@@ -44,7 +44,7 @@ class Malote(entidades.Malote):
         self.reason = 'Pagamento do pedido {} na Loja {}'.format(pedido.numero, dados_pagamento['nome_loja'])
         self.installments = dados_pagamento.get('parcelas', 1)
         self.payment_method_id = dados_pagamento['bandeira']
-        self.card_token_id = dados_pagamento['cartao_token']
+        self.card_token_id = dados_pagamento['cartao']
         self.payer_email = pedido.cliente['email']
         self.external_reference = pedido.numero
         notification_url = settings.NOTIFICACAO_URL.format(self.configuracao.loja_id, GATEWAY)
