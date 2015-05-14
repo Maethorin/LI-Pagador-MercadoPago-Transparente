@@ -17,7 +17,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
 
     def __init__(self, loja_id, dados):
         super(InstalaMeioDePagamento, self).__init__(loja_id, dados)
-        parametros = self.cria_entidade_pagador('ParametrosDeContrato', loja_id=loja_id).obter_para('mercadopago')
+        parametros = self.cria_entidade_pagador('ParametrosDeContrato', loja_id=loja_id).obter_para('mptransparente')
         self.client_id = parametros['client_id']
         self.client_secret = parametros['client_secret']
         headers = {
