@@ -208,7 +208,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             if self.tem_parcelas:
                 self.dados_pagamento['conteudo_json'].update({
                     'numero_parcelas': int(self.resposta.conteudo.get('installments', 1)),
-                    'valor_parcela': float(self.resposta.conteudo.get('installment_amount', self.resposta.conteudo['amount']))
+                    'valor_parcela': float(self.resposta.conteudo.get('installment_amount', float(self.dados_cartao.get('valor_parcela', '0.0'))))
                 })
             self.situacao_pedido = SituacoesDePagamento.do_tipo(self.resposta.conteudo['status'])
             self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
@@ -222,8 +222,12 @@ class EntregaPagamento(servicos.EntregaPagamento):
             )
 
     @property
+    def dados_cartao(self):
+        return self.pedido.conteudo_json.get('mptransparente', {})
+
+    @property
     def tem_parcelas(self):
-        parcelas = self.resposta.conteudo.get('installments', 1)
+        parcelas = self.dados_cartao.get('parcelas', 1)
         return int(parcelas) > 1
 
 

@@ -61,6 +61,15 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
         self.src_js_sdk = 'https://secure.mlstatic.com/org-img/checkout/custom/1.0/checkout.js'
         parametros = entidades.ParametrosDeContrato(loja_id).obter_para(self.extensao)
         self.public_key = parametros['public_key']
+        self.parcelas_por_bandeira = {
+            'visa': [1, 2, 3, 4, 5, 6, 9, 10, 12],
+            'mastercard': [1, 2, 3, 4, 5, 6, 9, 10, 12],
+            'hipercard': [1, 2, 3, 4, 5, 6, 9, 10, 12],
+            'diners_club_international': [1, 2, 3, 4, 5, 6, 9, 10, 12],
+            'elo': [1, 2, 3, 4, 5, 6, 9, 10, 12],
+            'amex': [1, 2, 3, 4, 5, 6, 9, 10, 12, 15],
+            'melicard': [1, 2, 3, 4, 5, 6, 9, 10, 12, 15, 18, 24]
+        }
         if not self.eh_listagem:
             self.formulario = cadastro.FormularioMercadoPagoTransparente()
             self.eh_aplicacao = True
