@@ -12,15 +12,31 @@ class PassosDeEnvio(object):
 
 
 class Cliente(entidades.BaseParaPropriedade):
-    _atributos = ['name', 'document_number', 'email', 'address', 'phone']
+    _atributos = ['email', 'first_name', 'last_name', 'phone', 'identification', 'address', 'registration_date']
 
 
 class Endereco(entidades.BaseParaPropriedade):
-    _atributos = ['street', 'neighborhood', 'zipcode', 'street_number', 'complementary']
+    _atributos = ['street_name', 'street_number', 'zip_code']
 
 
 class Telefone(entidades.BaseParaPropriedade):
-    _atributos = ['ddd', 'number']
+    _atributos = ['area_code', 'number']
+
+
+class Identificacao(entidades.BaseParaPropriedade):
+    _atributos = ['type', 'number']
+
+
+class Item(entidades.BaseParaPropriedade):
+    _atributos = ['id', 'title', 'description', 'picture_url', 'category_id', 'quantity', 'unit_price']
+
+
+class DadosEntrega(entidades.BaseParaPropriedade):
+    _atributos = ['cost', 'receiver_address']
+
+
+class EnderecoEntrega(entidades.BaseParaPropriedade):
+    _atributos = ['street_name', 'street_number', 'zip_code', 'floor', 'apartment']
 
 
 class Malote(entidades.Malote):
@@ -35,12 +51,17 @@ class Malote(entidades.Malote):
         self.payer_email = None
         self.external_reference = None
         self.notification_url = None
+        self.customer = None
+        self.items = None
+        self.shipments = None
+        self._pedido = None
 
     def monta_conteudo(self, pedido, parametros_contrato=None, dados=None):
         self.amount = self.formatador.formata_decimal(pedido.valor_total, como_float=True)
         dados_pagamento = pedido.conteudo_json.get(GATEWAY, {})
         if not dados_pagamento:
             raise self.DadosInvalidos('O pedido não foi montado corretamente no checkout.')
+        self._pedido = pedido
         self.reason = 'Pagamento do pedido {} na Loja {}'.format(pedido.numero, dados_pagamento['nome_loja'])
         self.installments = dados_pagamento.get('parcelas', 1)
         self.payment_method_id = dados_pagamento['bandeira']
@@ -49,6 +70,52 @@ class Malote(entidades.Malote):
         self.external_reference = pedido.numero
         notification_url = settings.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
         self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
+        self.customer = Cliente(
+            email=self._pedido.cliente['email'],
+            first_name=self.formatador.trata_unicode_com_limite(self._pedido.cliente_primeiro_nome),
+            last_name=self.formatador.trata_unicode_com_limite(self._pedido.cliente_ultimo_nome),
+            phone=self._cliente_telefone,
+            identification=self._cliente_documento,
+            address=Endereco(
+                zip_code=self._pedido.endereco_cliente['cep'],
+                street_name=self.formatador.trata_unicode_com_limite(self._pedido.endereco_cliente['endereco']),
+                street_number=self._pedido.endereco_cliente['numero']
+            ),
+            registration_date=self.formatador.formata_data(self._pedido.cliente['data_criacao'], iso=True)
+        )
+        self.shipments = DadosEntrega(
+            receiver_address=EnderecoEntrega(
+                zip_code=self._pedido.endereco_entrega['cep'],
+                street_name=self.formatador.trata_unicode_com_limite(self._pedido.endereco_entrega['endereco']),
+                street_number=self._pedido.endereco_entrega['numero'],
+                apartment=self.formatador.trata_unicode_com_limite(self._pedido.endereco_entrega['complemento'])
+            )
+        )
+        self.items = self._monta_items()
+
+    @property
+    def _cliente_telefone(self):
+        telefone = self._pedido.cliente_telefone
+        return Telefone(area_code=telefone[0], number=telefone[1])
+
+    @property
+    def _cliente_documento(self):
+        tipo = 'CPF' if self._pedido.endereco_cliente['tipo'] == "PF" else 'CNPJ'
+        return Identificacao(type=tipo, number=self._pedido.cliente_documento)
+
+    def _monta_items(self):
+        items = [
+            Item(
+                id=self.formatador.trata_unicode_com_limite(item.sku),
+                title=self.formatador.trata_unicode_com_limite(item.nome),
+                unit_price=self.formatador.formata_decimal(item.preco_venda, como_float=True),
+                quantity=self.formatador.formata_decimal(item.quantidade, como_float=True),
+                category_id='others',
+                picture_url=''
+            )
+            for item in self._pedido.itens
+        ]
+        return items
 
 
 class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
