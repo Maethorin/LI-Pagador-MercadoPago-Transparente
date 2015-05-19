@@ -191,7 +191,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
                 self.resposta.conteudo.get('error', '') == 'invalid_access_token'
             )
             if self.reenviar:
-                raise self.EnvioNaoRealizado(u'Autenticação da loja com o MercadoPago Falhou. Tentou reenviar: {}'.format(self.reenviar), self.loja_id, self.pedido.numero)
+                raise self.EnvioNaoRealizado(u'Autenticação da loja com o MercadoPago Falhou. Tentou reenviar: {}'.format(('SIM' if self.reenviar else u'NÃO')), self.loja_id, self.pedido.numero)
 
     def processa_dados_pagamento(self):
         if self.resposta.sucesso:

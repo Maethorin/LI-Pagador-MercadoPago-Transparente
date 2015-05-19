@@ -47,7 +47,7 @@ class Malote(entidades.Malote):
         self.card_token_id = dados_pagamento['cartao']
         self.payer_email = pedido.cliente['email']
         self.external_reference = pedido.numero
-        notification_url = settings.NOTIFICACAO_URL.format(self.configuracao.loja_id, GATEWAY)
+        notification_url = settings.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
         self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
 
 
@@ -69,6 +69,30 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
             'elo': [1, 2, 3, 4, 5, 6, 9, 10, 12],
             'amex': [1, 2, 3, 4, 5, 6, 9, 10, 12, 15],
             'melicard': [1, 2, 3, 4, 5, 6, 9, 10, 12, 15, 18, 24]
+        }
+        self.mensagens_erro_geracao_cartao = {
+            '106': {'mensagem': u'Você não pode fazer pagamentos para usuários em outros países.', 'referencia': 'geral'},
+            '109': {'mensagem': u'O seu cartão não aceita as parcelas selecionadas.', 'referencia': 'cartao'},
+            '126': {'mensagem': u'Não foi possível efetuar o pagamento com esse cartão.', 'referencia': 'cartao'},
+            '129': {'mensagem': u'O cartão informado não suporta o valor da compra.', 'referencia': 'geral'},
+            '145': {'mensagem': u'Não foi possível processar o pagamento.', 'referencia': 'geral'},
+            '150': {'mensagem': u'Você não pode realizar pagamentos por essa forma de pagamento. Por favor, escolha outra.', 'referencia': 'geral'},
+            '151': {'mensagem': u'Você não pode realizar pagamentos por essa forma de pagamento. Por favor, escolha outra.', 'referencia': 'geral'},
+            '160': {'mensagem': u'Não foi possível processar o pagamento.', 'referencia': 'geral'},
+            '204': {'mensagem': u'A operadora do cartão informado não está disponível no momento.', 'referencia': 'geral'},
+            '205': {'mensagem': u'Digite o seu número de cartão.', 'referencia': 'cartao'},
+            '208': {'mensagem': u'Escolha um mês para a data de expiração.', 'referencia': 'mes'},
+            '209': {'mensagem': u'Escolha um ano para a data de expiração.', 'referencia': 'ano'},
+            '221': {'mensagem': u'Digite o seu nome como está impresso no cartão.', 'referencia': 'nome'},
+            '224': {'mensagem': u'Digite o código de segurança do seu cartão.', 'referencia': 'cvv'},
+            'E301': {'mensagem': u'Número do cartão inválido.', 'referencia': 'cartao'},
+            'E302': {'mensagem': u'Código de segurança inválido.', 'referencia': 'cvv'},
+            '316': {'mensagem': u'Titular do cartão inválido.', 'referencia': 'nome'},
+            '322': {'mensagem': u'Você deve estar logado para realizar compras.', 'referencia': 'geral'},
+            '324': {'mensagem': u'Você deve estar logado para realizar compras.', 'referencia': 'geral'},
+            '325': {'mensagem': u'Mês da data de expiração inválido.', 'referencia': 'mes'},
+            '326': {'mensagem': u'Ano da data de expiração inválido.', 'referencia': 'ano'},
+            '801': {'mensagem': u'Você já enviou um pagamento semelhante no mesmo minuto. Tente novamente em alguns minutos.', 'referencia': 'geral'}
         }
         if not self.eh_listagem:
             self.formulario = cadastro.FormularioMercadoPagoTransparente()
