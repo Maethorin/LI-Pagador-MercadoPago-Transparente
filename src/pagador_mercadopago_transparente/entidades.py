@@ -133,6 +133,8 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
             'mastercard': [1, 2, 3, 4, 5, 6, 9, 10, 12],
             'hipercard': [1, 2, 3, 4, 5, 6, 9, 10, 12],
             'diners_club_international': [1, 2, 3, 4, 5, 6, 9, 10, 12],
+            'diners_club_carte_blanche': [1, 2, 3, 4, 5, 6, 9, 10, 12],
+            'discover': [1, 2, 3, 4, 5, 6, 9, 10, 12],
             'elo': [1, 2, 3, 4, 5, 6, 9, 10, 12],
             'amex': [1, 2, 3, 4, 5, 6, 9, 10, 12, 15],
             'melicard': [1, 2, 3, 4, 5, 6, 9, 10, 12, 15, 18, 24]
@@ -161,8 +163,10 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
             '326': {'mensagem': u'Ano da data de expiração inválido.', 'referencia': 'ano'},
             '801': {'mensagem': u'Você já enviou um pagamento semelhante no mesmo minuto. Tente novamente em alguns minutos.', 'referencia': 'geral'}
         }
+        _formulario = cadastro.FormularioMercadoPagoTransparente()
+        self._parcelas = _formulario.obter_parcelas_disponiveis()
         if not self.eh_listagem:
-            self.formulario = cadastro.FormularioMercadoPagoTransparente()
+            self.formulario = _formulario
             self.eh_aplicacao = True
 
     @property
