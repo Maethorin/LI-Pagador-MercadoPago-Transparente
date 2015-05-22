@@ -98,6 +98,9 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
             resposta = self.conexao.delete(url)
         if resposta.sucesso:
             return u'Aplicação removida com sucesso'
+        if resposta.requisicao_invalida:
+            if resposta.conteudo and 'Error validating grant' in resposta.conteudo.get('message', ''):
+                raise self.InstalacaoNaoFinalizada(u'Erro de validação de dados junto ao MercadoPago', status=401)
         raise self.InstalacaoNaoFinalizada(u'Aplicação não foi removida do MercadoPago devido a um erro de comunicação. Código: {}, Resposta: {}'.format(resposta.status_code, resposta.conteudo))
 
 
