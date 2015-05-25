@@ -70,6 +70,8 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
     def obter_dados(self):
         url = 'https://api.mercadolibre.com/oauth/token'
         tipo = self.dados.get('tipo', 'instalar')
+        if self.dados.get('error', '') == 'access-denied':
+            raise self.InstalacaoNaoFinalizada(u'A autorização foi cancelada no MercadoPago.')
         if tipo == 'instalar':
             dados = self._dados_instalacao
         else:
@@ -93,7 +95,10 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         resposta = self.conexao.delete(url)
         if resposta.nao_autorizado:
             self.dados['tipo'] = 'atualizar'
-            dados_atualizados = self.obter_dados()
+            try:
+                dados_atualizados = self.obter_dados()
+            except self.InstalacaoNaoFinalizada:
+                raise self.InstalacaoNaoFinalizada(u'Erro de validação de dados junto ao MercadoPago', status=401)
             url = url_base.format(dados['usuario'], self.client_id, dados_atualizados['token'])
             resposta = self.conexao.delete(url)
         if resposta.sucesso:
