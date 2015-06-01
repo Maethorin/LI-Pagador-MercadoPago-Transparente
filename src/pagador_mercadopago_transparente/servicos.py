@@ -126,13 +126,12 @@ class Credenciador(servicos.Credenciador):
     def obter_credenciais(self):
         return self.access_token
 
-
 MENSAGENS_RETORNO = {
     '106': u'Você não poe fazer pagamentos para usuários em outros países.',
     '109': u'O seu cartão não aceita as parcelas selecionadas.',
     '126': u'Não foi possível efetuar o pagamento com esse cartão.',
     '129': u'O cartão informado não suporta o valor da compra.',
-    '145': u'Não foi possível processar o pagamento.',
+    '145': u'Não foi possível processar o pagamento com o e-mail cadastrado.',
     '150': u'Você não pode realizar pagamentos por essa forma de pagamento. Por favor, escolha outra.',
     '151': u'Você não pode realizar pagamentos por essa forma de pagamento. Por favor, escolha outra.',
     '160': u'Não foi possível processar o pagamento.',
@@ -221,6 +220,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             self.situacao_pedido = SituacoesDePagamento.do_tipo(self.resposta.conteudo['status'])
             self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
         if self.resposta.requisicao_invalida:
+            self.situacao_pedido = SituacoesDePagamento.do_tipo('rejected')
             raise self.EnvioNaoRealizado(
                 u'Dados inválidos enviados ao MercadoPago',
                 self.loja_id,
