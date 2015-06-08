@@ -316,7 +316,7 @@ class RegistraNotificacao(servicos.RegistraResultado):
         elif self.resposta:
             self.resultado = {'resultado': 'erro', 'status_code': self.resposta.status_code, 'conteudo': self.resposta.conteudo}
         else:
-            self.resultado = {'resultado': 'erro', 'status_code': 500, 'conteudo': u'MercadoPago não retornou uma resposta válida'}
+            self.resultado = {'resultado': 'erro', 'status_code': 500, 'conteudo': {'mensagem': u'MercadoPago não retornou uma resposta válida'}}
 
     def reenviando(self):
         self.tentativa += 1
