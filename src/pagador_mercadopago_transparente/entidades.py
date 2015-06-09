@@ -62,7 +62,7 @@ class Malote(entidades.Malote):
         if not dados_pagamento:
             raise self.DadosInvalidos('O pedido não foi montado corretamente no checkout.')
         self._pedido = pedido
-        self.reason = 'Pagamento do pedido {} na Loja {}'.format(pedido.numero, dados_pagamento['nome_loja'])
+        self.reason = 'Pagamento do pedido {} na Loja {}'.format(pedido.numero, dados_pagamento['nome_loja'].encode("utf8"))
         self.installments = dados_pagamento.get('parcelas', 1)
         self.payment_method_id = dados_pagamento['bandeira']
         self.card_token_id = dados_pagamento['cartao']
