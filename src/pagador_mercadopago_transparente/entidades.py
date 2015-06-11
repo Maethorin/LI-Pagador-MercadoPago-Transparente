@@ -143,6 +143,7 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
         self.mensagens_erro_geracao_cartao = {
             '106': {'mensagem': u'Você não pode fazer pagamentos para usuários em outros países.', 'referencia': 'geral'},
             '109': {'mensagem': u'O seu cartão não aceita as parcelas selecionadas.', 'referencia': 'cartao'},
+            '132': {'mensagem': u'Não é possível efetuar pagamento desse valor com esse cartão.', 'referencia': 'cartao'},
             '126': {'mensagem': u'Não foi possível efetuar o pagamento com esse cartão.', 'referencia': 'cartao'},
             '129': {'mensagem': u'O cartão informado não suporta o valor da compra.', 'referencia': 'geral'},
             '145': {'mensagem': u'Não foi possível processar o pagamento.', 'referencia': 'geral'},

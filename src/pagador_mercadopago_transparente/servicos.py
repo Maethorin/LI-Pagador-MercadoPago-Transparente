@@ -131,6 +131,7 @@ MENSAGENS_RETORNO = {
     '109': u'O seu cartão não aceita as parcelas selecionadas.',
     '126': u'Não foi possível efetuar o pagamento com esse cartão.',
     '129': u'O cartão informado não suporta o valor da compra.',
+    '132': u'Não é possível efetuar pagamento desse valor com esse cartão.',
     '145': u'Não foi possível processar o pagamento com o e-mail cadastrado.',
     '150': u'Você não pode realizar pagamentos por essa forma de pagamento. Por favor, escolha outra.',
     '151': u'Você não pode realizar pagamentos por essa forma de pagamento. Por favor, escolha outra.',
@@ -221,12 +222,18 @@ class EntregaPagamento(servicos.EntregaPagamento):
             self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
         if self.resposta.requisicao_invalida:
             self.situacao_pedido = SituacoesDePagamento.do_tipo('rejected')
+            erros = [u'{}: {}'.format(causa['code'], MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
+            self.dados_pagamento = {
+                'conteudo_json': {
+                    'mensagem_retorno': erros
+                }
+            }
             raise self.EnvioNaoRealizado(
                 u'Dados inválidos enviados ao MercadoPago',
                 self.loja_id,
                 self.pedido.numero,
                 dados_envio=self.malote.to_dict(),
-                erros=[u'{}: {}'.format(causa['code'], MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
+                erros=erros
             )
 
     @property
