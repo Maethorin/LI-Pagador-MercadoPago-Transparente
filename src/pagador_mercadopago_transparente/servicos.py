@@ -329,7 +329,7 @@ class RegistraNotificacao(servicos.RegistraResultado):
                 return
             self.pedido_numero = self.dados.get('referencia', None) or self.retorno.dados['external_reference']
             self.dados_pagamento = {
-                'transacao_id': self.dados['id']
+                'transacao_id': self.retorno.dados['id']
             }
             if 'total_paid_amount' in self.retorno.dados:
                 self.dados_pagamento['valor_pago'] = self.retorno.dados['total_paid_amount']
