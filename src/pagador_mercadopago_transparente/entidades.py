@@ -131,7 +131,7 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
         self.public_key = parametros['public_key']
         self.parcelas_por_bandeira = {
             'visa': [1, 2, 3, 4, 5, 6, 9, 10, 12],
-            'mastercard': [1, 2, 3, 4, 5, 6, 9, 10, 12],
+            'master': [1, 2, 3, 4, 5, 6, 9, 10, 12],
             'hipercard': [1, 2, 3, 4, 5, 6, 9, 10, 12],
             'diners_club_international': [1, 2, 3, 4, 5, 6, 9, 10, 12],
             'diners_club_carte_blanche': [1, 2, 3, 4, 5, 6, 9, 10, 12],
