@@ -102,6 +102,22 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.conexao.post.assert_called_with(entregador.url, {'zas': 'malote-como-dicionario'})
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    def test_enviar_pagamento_dispara_erro_pedido_ja_realizado_e_cancelado(self):
+        entregador = servicos.EntregaPagamento(8, dados={})
+        entregador.pedido = mock.MagicMock(numero=1234, situacao_id=8)
+        entregador.envia_pagamento.when.called_with().should.throw(
+            entregador.PedidoJaRealizado, u'Já foi realizado um pedido com o número 1234 e ele está como Pedido Cancelado.\nSeu pedido foi cancelado e não pode ser mais usado. Você precisa fazer um novo pedido na loja.'
+        )
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    def test_enviar_pagamento_dispara_erro_pedido_ja_realizado_e_pago(self):
+        entregador = servicos.EntregaPagamento(8, dados={})
+        entregador.pedido = mock.MagicMock(numero=1234, situacao_id=4)
+        entregador.envia_pagamento.when.called_with().should.throw(
+            entregador.PedidoJaRealizado, u'Já foi realizado um pedido com o número 1234 e ele está como Pedido Pago.\nSeu pagamento já está pago e estamos processando o envio'
+        )
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     def test_pre_envio_nao_tem_parcelas_sem_cartao_parcelas_em_dados(self):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
         entregador.pedido = mock.MagicMock(conteudo_json={})
@@ -115,8 +131,8 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     def test_pre_envio_tem_parcelas_comm_cartao_parcelas_maior_que_um(self):
-        entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre', 'cartao_parcelas': 3})
-        entregador.pedido = mock.MagicMock(conteudo_json={})
+        entregador = servicos.EntregaPagamento(1234)
+        entregador.pedido = mock.MagicMock(conteudo_json={'mptransparente': {'parcelas': 3}})
         entregador.tem_parcelas.should.be.truthy
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
@@ -124,9 +140,9 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
         entregador.pedido = mock.MagicMock(valor_total=15.70)
         entregador.servico = mock.MagicMock()
-        entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'id': 'identificacao-id', 'tid': 'transacao-id', 'card_brand': 'visa'})
+        entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'payment_id': 'transacao-id', 'amount': 123.45, 'payment_method_id': 'visa'})
         entregador.processa_dados_pagamento()
-        entregador.dados_pagamento.should.be.equal({'transacao_id': 'transacao-id', 'valor_pago': 15.7})
+        entregador.dados_pagamento.should.be.equal({'conteudo_json': {'bandeira': 'visa', 'mensagem_retorno': u'Seu pagamento foi aprovado com sucesso.'}, 'transacao_id': 'transacao-id', 'valor_pago': 123.45})
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     def test_processar_dados_de_pagamento_dispara_erro_se_invalido(self):
@@ -136,15 +152,7 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.pedido = mock.MagicMock(numero=1234)
         entregador.resposta = mock.MagicMock(sucesso=False, requisicao_invalida=True, conteudo={u'url': u'/transactions', u'errors': [{u'message': u'Nome do portador do cartão está faltando', u'type': u'invalid_parameter', u'parameter_name': u'card_holder_name'}, {u'message': u'Data de expiração do cartão está faltando', u'type': u'invalid_parameter', u'parameter_name': u'card_expiration_date'}], u'method': u'post'})
         entregador.processa_dados_pagamento.when.called_with().should.throw(
-            entregador.EnvioNaoRealizado,
-            '\n'.join([
-                'Pedido 1234 na Loja Id 8',
-                u'Dados inválidos enviados ao MercadoPago:',
-                u'\tcard_holder_name: Nome do portador do cartão está faltando',
-                u'\tcard_expiration_date: Data de expiração do cartão está faltando',
-                'Tentou enviar com os seguintes dados:',
-                "{'card_hash': None, 'capture': 'false', 'amount': 2900, 'installments': 1, 'payment_method': 'credit_card'}"
-            ])
+            entregador.EnvioNaoRealizado, u'Dados inválidos enviados ao MercadoPago'
         )
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
@@ -155,15 +163,7 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.pedido = mock.MagicMock(numero=1234)
         entregador.resposta = mock.MagicMock(sucesso=False, requisicao_invalida=True, conteudo={u'url': u'/transactions', u'errors': [{u'message': u'Nome do portador do cartão está faltando', u'type': u'whatever'}, {u'message': u'Data de expiração do cartão está faltando', u'type': u'whatever'}], u'method': u'post'})
         entregador.processa_dados_pagamento.when.called_with().should.throw(
-            entregador.EnvioNaoRealizado,
-            '\n'.join([
-                'Pedido 1234 na Loja Id 8',
-                u'Dados inválidos enviados ao MercadoPago:',
-                u'\tNome do portador do cartão está faltando',
-                u'\tData de expiração do cartão está faltando',
-                'Tentou enviar com os seguintes dados:',
-                "{'card_hash': None, 'capture': 'false', 'amount': 2900, 'installments': 1, 'payment_method': 'credit_card'}"
-            ])
+            entregador.EnvioNaoRealizado, u'Dados inválidos enviados ao MercadoPago'
         )
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
@@ -172,6 +172,6 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.configuracao = mock.MagicMock(aplicacao='test')
         entregador.pedido = mock.MagicMock(valor_total=15.70)
         entregador.servico = mock.MagicMock()
-        entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'id': 'identificacao-id', 'tid': 'transacao-id', 'card_brand': 'visa'})
+        entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'payment_id': 'transacao-id', 'amount': 123.45, 'payment_method_id': 'visa'})
         entregador.processa_dados_pagamento()
-        entregador.identificacao_pagamento.should.be.equal('identificacao-id')
+        entregador.identificacao_pagamento.should.be.equal('transacao-id')

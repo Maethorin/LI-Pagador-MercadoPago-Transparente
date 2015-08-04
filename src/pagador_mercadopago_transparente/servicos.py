@@ -197,7 +197,13 @@ class EntregaPagamento(servicos.EntregaPagamento):
             next_url = self.dados.get('next_url', None)
             if next_url:
                 self.resultado['next_url'] = next_url
-            raise self.PedidoJaRealizado(u'Esse pedido já foi realizado e está com status {}'.format(self.pedido.situacao_id))
+            raise self.PedidoJaRealizado(
+                u'Já foi realizado um pedido com o número {} e ele está como {}.\n{}'.format(
+                    self.pedido.numero,
+                    servicos.SituacaoPedido.NOMES_SITUACAO[self.pedido.situacao_id],
+                    servicos.SituacaoPedido.mensagens_complementares(self.pedido.situacao_id)
+                )
+            )
         self.tentativa = tentativa
         if self.tentativa > 1:
             self.atualiza_credenciais()
