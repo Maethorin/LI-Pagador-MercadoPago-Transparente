@@ -40,7 +40,7 @@ class FormularioMPTransparente(unittest.TestCase):
         self.formulario.maximo_parcelas.tipo.should.be.equal(cadastro.cadastro.TipoDeCampo.escolha)
 
     def test_deve_ter_quantidade_certa_parcelas(self):
-        self.formulario._PARCELAS.should.be.equal([(24, "Todas"), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (9, 9), (10, 10), (12, 12), (15, 15), (18, 18), (24, 24)])
+        self.formulario._PARCELAS.should.be.equal([(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (9, 9), (10, 10), (12, 12), (15, 15), (18, 18), (24, 24)])
 
     def test_deve_ter_parcelas_sem_juros(self):
         self.formulario.parcelas_sem_juros.nome.should.be.equal('parcelas_sem_juros')

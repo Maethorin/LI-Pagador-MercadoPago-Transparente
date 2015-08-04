@@ -7,8 +7,8 @@ from pagador_mercadopago_transparente import servicos
 class MPTransparenteCredenciais(unittest.TestCase):
     def test_deve_definir_propriedades(self):
         credenciador = servicos.Credenciador(configuracao=mock.MagicMock())
-        credenciador.tipo.should.be.equal(credenciador.TipoAutenticacao.form_urlencode)
-        credenciador.chave.should.be.equal('api_key')
+        credenciador.tipo.should.be.equal(credenciador.TipoAutenticacao.query_string)
+        credenciador.chave.should.be.equal('access_token')
 
     def test_deve_retornar_credencial_baseado_no_usuario(self):
         configuracao = mock.MagicMock(token='api-key')
@@ -17,11 +17,11 @@ class MPTransparenteCredenciais(unittest.TestCase):
 
 
 class MPTransparenteSituacoesPagamento(unittest.TestCase):
-    def test_deve_retornar_pago_para_paid(self):
-        servicos.SituacoesDePagamento.do_tipo('paid').should.be.equal(servicos.servicos.SituacaoPedido.SITUACAO_PEDIDO_PAGO)
+    def test_deve_retornar_pago_para_approved(self):
+        servicos.SituacoesDePagamento.do_tipo('approved').should.be.equal(servicos.servicos.SituacaoPedido.SITUACAO_PEDIDO_PAGO)
 
-    def test_deve_retornar_cancelado_para_refused(self):
-        servicos.SituacoesDePagamento.do_tipo('refused').should.be.equal(servicos.servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO)
+    def test_deve_retornar_cancelado_para_rejected(self):
+        servicos.SituacoesDePagamento.do_tipo('rejected').should.be.equal(servicos.servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO)
 
     def test_deve_retornar_none_para_desconhecido(self):
         servicos.SituacoesDePagamento.do_tipo('zas').should.be.none
@@ -50,10 +50,11 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao')
     def test_deve_montar_conexao(self, obter_mock):
-        obter_mock.return_value = 'conexao'
+        conexao = mock.MagicMock()
+        obter_mock.return_value = conexao
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
-        entregador.conexao.should.be.equal('conexao')
-        obter_mock.assert_called_with(formato_envio='application/x-www-form-urlencoded')
+        entregador.conexao.should.be.equal(conexao)
+        obter_mock.assert_called_with()
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     @mock.patch('pagador_mercadopago_transparente.servicos.Credenciador')
@@ -82,6 +83,8 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.malote = mock.MagicMock()
         entregador.malote.to_dict.return_value = {'zas': 'malote-como-dicionario'}
         entregador.conexao = mock.MagicMock()
+        entregador.pedido = mock.MagicMock(situacao_id=None)
+        entregador.dados = {'next_url': 'zas'}
         resposta_mock = mock.MagicMock(nao_autorizado=False, nao_autenticado=False)
         entregador.conexao.post.return_value = resposta_mock
         entregador.envia_pagamento()
@@ -94,23 +97,26 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.malote = mock.MagicMock()
         entregador.malote.to_dict.return_value = {'zas': 'malote-como-dicionario'}
         entregador.conexao = mock.MagicMock()
+        entregador.pedido = mock.MagicMock(situacao_id=None)
         entregador.envia_pagamento()
         entregador.conexao.post.assert_called_with(entregador.url, {'zas': 'malote-como-dicionario'})
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     def test_pre_envio_nao_tem_parcelas_sem_cartao_parcelas_em_dados(self):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
+        entregador.pedido = mock.MagicMock(conteudo_json={})
         entregador.tem_parcelas.should.be.falsy
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     def test_pre_envio_nao_tem_parcelas_com_cartao_parcelas_igual_a_um(self):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre', 'cartao_parcelas': 1})
-
+        entregador.pedido = mock.MagicMock(conteudo_json={})
         entregador.tem_parcelas.should.be.falsy
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     def test_pre_envio_tem_parcelas_comm_cartao_parcelas_maior_que_um(self):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre', 'cartao_parcelas': 3})
+        entregador.pedido = mock.MagicMock(conteudo_json={})
         entregador.tem_parcelas.should.be.truthy
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())

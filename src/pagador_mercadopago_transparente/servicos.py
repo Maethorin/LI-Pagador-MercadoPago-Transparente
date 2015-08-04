@@ -174,6 +174,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
         self.tem_malote = True
         self.faz_http = True
         self.conexao = self.obter_conexao()
+        self.conexao.tenta_outra_vez = False
         self.url = 'https://api.mercadolibre.com/checkout/custom/create_payment'
         self.tentativa = 1
         self.tentativa_maxima = 2
