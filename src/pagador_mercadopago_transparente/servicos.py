@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from time import sleep
 from urllib import urlencode
 from datetime import datetime, timedelta
 
 from li_common.comunicacao import requisicao
 
 from pagador import settings, servicos
+
+
+TEMPO_MAXIMO_ESPERA_NOTIFICACAO = 30
 
 
 class TipoToken(object):
@@ -151,6 +155,7 @@ MENSAGENS_RETORNO = {
     'accredited': u'Seu pagamento foi aprovado com sucesso.',
     'pending_contingency': u'Estamos processando o pagamento e em até 1 hora você será informado do resultado por e-mail.',
     'pending_review_manual': u'O pagamento está em análise e em até 2 dias úteis você será informado do resultado por e-mail.',
+    'payer_unavailable': u'Seu pagamento não pode ser processado. Verifique seu cadastro junto ao MercadoPago.',
     'cc_rejected_bad_filled_card_number': u'O número do cartão informado é inválido.',
     'cc_rejected_bad_filled_date': u'A data de expiração do cartão é inválida.',
     'cc_rejected_bad_filled_other': u'Uma ou mais informações enviadas estão inválidas.',
