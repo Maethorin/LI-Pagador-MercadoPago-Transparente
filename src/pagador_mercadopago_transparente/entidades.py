@@ -154,6 +154,7 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
             '205': {'mensagem': u'Digite o seu número de cartão.', 'referencia': 'cartao'},
             '208': {'mensagem': u'Escolha um mês para a data de expiração.', 'referencia': 'mes'},
             '209': {'mensagem': u'Escolha um ano para a data de expiração.', 'referencia': 'ano'},
+            '214': {'mensagem': u'Você precisa estar logado ou preencher o cadastro de novo cliente para finalizar.', 'referencia': 'geral'},
             '221': {'mensagem': u'Digite o seu nome como está impresso no cartão.', 'referencia': 'nome'},
             '224': {'mensagem': u'Digite o código de segurança do seu cartão.', 'referencia': 'cvv'},
             'E301': {'mensagem': u'Número do cartão inválido.', 'referencia': 'cartao'},
