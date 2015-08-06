@@ -118,33 +118,36 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         )
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
-    def test_pre_envio_nao_tem_parcelas_sem_cartao_parcelas_em_dados(self):
+    @mock.patch('pagador_mercadopago_transparente.servicos.TEMPO_MAXIMO_ESPERA_NOTIFICACAO', 1)
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.cria_entidade_pagador')
+    def test_processar_dados_de_pagamento_define_dados_pagamento(self, cria_pedido_mock):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
-        entregador.pedido = mock.MagicMock(conteudo_json={})
-        entregador.tem_parcelas.should.be.falsy
-
-    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
-    def test_pre_envio_nao_tem_parcelas_com_cartao_parcelas_igual_a_um(self):
-        entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre', 'cartao_parcelas': 1})
-        entregador.pedido = mock.MagicMock(conteudo_json={})
-        entregador.tem_parcelas.should.be.falsy
-
-    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
-    def test_pre_envio_tem_parcelas_comm_cartao_parcelas_maior_que_um(self):
-        entregador = servicos.EntregaPagamento(1234)
-        entregador.pedido = mock.MagicMock(conteudo_json={'mptransparente': {'parcelas': 3}})
-        entregador.tem_parcelas.should.be.truthy
-
-    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
-    def test_processar_dados_de_pagamento_define_dados_pagamento(self):
-        entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
-        entregador.pedido = mock.MagicMock(valor_total=15.70)
         entregador.servico = mock.MagicMock()
+        entregador.configuracao = mock.MagicMock(loja_id=8)
+        entregador.pedido = mock.MagicMock(numero=123, valor_total=15.70, conteudo_json={'mptransparente': {'valor_parcela': 15.7}})
+        entregador.malote = mock.MagicMock(amount=15.70, payment_method_id='visa')
         entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'payment_id': 'transacao-id', 'amount': 123.45, 'payment_method_id': 'visa'})
+        cria_pedido_mock.return_value = mock.MagicMock(situacao_id=9)
         entregador.processa_dados_pagamento()
-        entregador.dados_pagamento.should.be.equal({'conteudo_json': {'bandeira': 'visa', 'mensagem_retorno': u'Seu pagamento foi aprovado com sucesso.'}, 'transacao_id': 'transacao-id', 'valor_pago': 123.45})
+        cria_pedido_mock.assert_called_with('Pedido', numero=123, loja_id=8)
+        entregador.dados_pagamento.should.be.equal({'conteudo_json': {'bandeira': 'visa', 'mensagem_retorno': u'Seu pagamento foi aprovado com sucesso.', 'numero_parcelas': 1, 'valor_parcela': 15.7}, 'transacao_id': 'transacao-id', 'valor_pago': 15.7})
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    @mock.patch('pagador_mercadopago_transparente.servicos.TEMPO_MAXIMO_ESPERA_NOTIFICACAO', 1)
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.cria_entidade_pagador')
+    def test_processar_dados_de_pagamento_retorna_se_notificacao_jah_atualizou(self, cria_pedido_mock):
+        entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
+        entregador.servico = mock.MagicMock()
+        entregador.configuracao = mock.MagicMock(loja_id=8)
+        entregador.pedido = mock.MagicMock(numero=123)
+        cria_pedido_mock.return_value = mock.MagicMock(situacao_id=4)
+        entregador.processa_dados_pagamento()
+        cria_pedido_mock.assert_called_with('Pedido', numero=123, loja_id=8)
+        entregador.dados_pagamento.should.be.none
+        entregador.resultado.should.be.equal({'fatal': False, 'mensagem': '', 'resultado': 'alterado_por_notificacao'})
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    @mock.patch('pagador_mercadopago_transparente.servicos.TEMPO_MAXIMO_ESPERA_NOTIFICACAO', 0)
     def test_processar_dados_de_pagamento_dispara_erro_se_invalido(self):
         entregador = servicos.EntregaPagamento(8, dados={'passo': 'pre'})
         entregador.malote = mock.MagicMock()
@@ -156,6 +159,7 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         )
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    @mock.patch('pagador_mercadopago_transparente.servicos.TEMPO_MAXIMO_ESPERA_NOTIFICACAO', 0)
     def test_processar_dados_de_pagamento_dispara_erro_sem_ser_parameter(self):
         entregador = servicos.EntregaPagamento(8, dados={'passo': 'pre'})
         entregador.malote = mock.MagicMock()
@@ -167,10 +171,12 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         )
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    @mock.patch('pagador_mercadopago_transparente.servicos.TEMPO_MAXIMO_ESPERA_NOTIFICACAO', 0)
     def test_processar_dados_de_pagamento_define_identificador_id(self):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
         entregador.configuracao = mock.MagicMock(aplicacao='test')
-        entregador.pedido = mock.MagicMock(valor_total=15.70)
+        entregador.pedido = mock.MagicMock(numero=123, valor_total=15.70, conteudo_json={'mptransparente': {'valor_parcela': 15.7}})
+        entregador.malote = mock.MagicMock(amount=15.70, payment_method_id='visa')
         entregador.servico = mock.MagicMock()
         entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'payment_id': 'transacao-id', 'amount': 123.45, 'payment_method_id': 'visa'})
         entregador.processa_dados_pagamento()
