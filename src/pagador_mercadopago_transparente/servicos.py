@@ -153,6 +153,8 @@ MENSAGENS_RETORNO = {
     '325': u'Mês da data de expiração inválido.',
     '326': u'Ano da data de expiração inválido.',
     '801': u'Você já enviou um pagamento semelhante no mesmo minuto. Tente novamente em alguns minutos.',
+    '2004': u'Pedido cancelado devido a um erro interno no MercadoPago.',
+    '3005': u'Esse pedido foi cancelado devido a um erro de processamento pelo MercadoPago.',
     'accredited': u'Seu pagamento foi aprovado com sucesso.',
     'pending_contingency': u'Estamos processando o pagamento e em até 1 hora você será informado do resultado por e-mail.',
     'pending_review_manual': u'O pagamento está em análise e em até 2 dias úteis você será informado do resultado por e-mail.',
@@ -239,7 +241,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             self.situacao_pedido = SituacoesDePagamento.do_tipo(self.resposta.conteudo['status'])
             mensagem_retorno = MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
             self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
-        if self.resposta.requisicao_invalida:
+        else:
             self.situacao_pedido = SituacoesDePagamento.do_tipo('rejected')
             erros = [u'{}: {}'.format(causa['code'], MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
             self.dados_pagamento = {
