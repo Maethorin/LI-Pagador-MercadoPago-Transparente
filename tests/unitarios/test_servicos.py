@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+import os
 import unittest
 import mock
 from pagador_mercadopago_transparente import servicos
@@ -181,3 +183,35 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'payment_id': 'transacao-id', 'amount': 123.45, 'payment_method_id': 'visa'})
         entregador.processa_dados_pagamento()
         entregador.identificacao_pagamento.should.be.equal('transacao-id')
+
+
+class MPTransparenteAtualizaTransacoes(unittest.TestCase):
+    @mock.patch('pagador_mercadopago_transparente.servicos.AtualizaTransacoes.obter_conexao')
+    def test_monta_consulta_corretamente(self, obter_con_mock):
+        atualizador = servicos.AtualizaTransacoes(1234, dados={'data_inicial': '2015-08-22', 'data_final': '2015-08-23'})
+        atualizador.consulta_transacoes()
+        obter_con_mock.return_value.get.assert_called_with('https://api.mercadopago.com/collections/search', dados={'sort': 'date_created', 'begin_date': '2015-08-22T00:00', 'end_date': '2015-08-23T23:59', 'range': 'date_created', 'limit': 1000, 'criteria': 'desc'})
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.AtualizaTransacoes.obter_conexao', mock.MagicMock)
+    def test_resultado_com_erro(self):
+        atualizador = servicos.AtualizaTransacoes(1234, dados={'data_inicial': '2015-08-22', 'data_final': '2015-08-23'})
+        atualizador.resposta = mock.MagicMock(sucesso=False, conteudo={'message': 'invalid_token', 'cause': [0], 'error': 'not_found','status': 401})
+        atualizador.analisa_resultado_transacoes()
+        atualizador.dados_pedido.should.be.empty
+        atualizador.erros.should.be.equal({'cause': [0], 'error': 'not_found', 'message': 'invalid_token', 'status': 401})
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.AtualizaTransacoes.obter_conexao', mock.MagicMock)
+    def test_resultado_com_erro(self):
+        atualizador = servicos.AtualizaTransacoes(1234, dados={'data_inicial': '2015-08-22', 'data_final': '2015-08-23'})
+        atualizador.resposta = mock.MagicMock(sucesso=False, conteudo={'message': 'invalid_token', 'cause': [0], 'error': 'not_found','status': 401})
+        atualizador.analisa_resultado_transacoes()
+        atualizador.dados_pedido.should.be.empty
+        atualizador.erros.should.be.equal({'cause': [0], 'error': 'not_found', 'message': 'invalid_token', 'status': 401})
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.AtualizaTransacoes.obter_conexao', mock.MagicMock)
+    def test_resultado_com_dados_de_pedido(self):
+        atualizador = servicos.AtualizaTransacoes(1234, dados={'data_inicial': '2015-08-22', 'data_final': '2015-08-23'})
+        conteudo = json.load(open(os.path.join(os.path.abspath(os.path.curdir), 'unitarios', 'reposta_consulta_transacoes.json')))
+        atualizador.resposta = mock.MagicMock(sucesso=True, conteudo=conteudo)
+        atualizador.analisa_resultado_transacoes()
+        atualizador.dados_pedido.should.be.equal([{'situacao_pedido': 4, 'pedido_numero': u'168'}, {'situacao_pedido': 4, 'pedido_numero': u'166'}])

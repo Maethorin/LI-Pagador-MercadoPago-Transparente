@@ -406,3 +406,44 @@ class RegistraNotificacao(servicos.RegistraResultado):
             return 'https://api.mercadolibre.com/collections/notifications/{}'.format(self.dados['id'])
         if self.retorno.topico == Retorno.ordem_pagamento:
             return self.dados.get('resource', 'https://api.mercadolibre.com/merchant_orders/{}'.format(self.dados['id']))
+
+
+class AtualizaTransacoes(servicos.AtualizaTransacoes):
+    def __init__(self, loja_id, dados):
+        super(AtualizaTransacoes, self).__init__(loja_id, dados)
+        self.url = 'https://api.mercadopago.com/collections/search'
+        self.conexao = self.obter_conexao(formato_envio=requisicao.Formato.querystring)
+
+    def define_credenciais(self):
+        self.conexao.credenciador = Credenciador(configuracao=self.configuracao)
+
+    def _gera_dados_envio(self):
+        initial_date = '{}T00:00'.format(self.dados['data_inicial'])
+        final_date = '{}T23:59'.format(self.dados['data_final'])
+        return {
+            'criteria': 'desc',
+            'sort': 'date_created',
+            'range': 'date_created',
+            'limit': 1000,
+            'begin_date': initial_date,
+            'end_date': final_date
+        }
+
+    def consulta_transacoes(self):
+        self.dados_enviados = self._gera_dados_envio()
+        self.resposta = self.conexao.get(self.url, dados=self.dados_enviados)
+
+    def analisa_resultado_transacoes(self):
+        if self.resposta.sucesso:
+            transacoes = self.resposta.conteudo['results']
+            self.dados_pedido = []
+            for transacao in transacoes:
+                transacao = transacao['collection']
+                if transacao['notification_url'] and GATEWAY in transacao['notification_url']:
+                    self.dados_pedido.append({
+                        'situacao_pedido': SituacoesDePagamento.do_tipo(transacao['status']),
+                        'pedido_numero': transacao['external_reference']
+                    })
+        else:
+            if 'error' in self.resposta.conteudo:
+                self.erros = self.resposta.conteudo

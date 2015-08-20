@@ -1,0 +1,1107 @@
+{
+  "paging": {
+    "total": 16,
+    "limit": 1000,
+    "offset": 0
+  },
+  "results": [
+    {
+      "collection": {
+        "id": 1278823433,
+        "site_id": "MLB",
+        "date_created": "2015-08-20T16:18:29.000-04:00",
+        "date_approved": "2015-08-20T16:18:29.000-04:00",
+        "last_modified": "2015-08-20T16:18:29.000-04:00",
+        "money_release_date": "2015-09-10T16:18:29.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "@190628696",
+          "first_name": "Camila",
+          "last_name": "Barbosa",
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": "camilinha.fjv4@gmail.com",
+          "id": 190628696,
+          "identification": {
+            "type": "CPF",
+            "number": "13129851780"
+          }
+        },
+        "external_reference": "168",
+        "merchant_order_id": null,
+        "reason": "Pagamento do pedido 168 na Loja BrasilLaser Ateliê de Personalizados",
+        "currency_id": "BRL",
+        "transaction_amount": 77,
+        "total_paid_amount": 79.32,
+        "shipping_cost": 0,
+        "account_money_amount": 0,
+        "mercadopago_fee": 3.84,
+        "net_received_amount": 73.16,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": "00",
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 2,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": "Kamila s nascimento",
+          "identification": {
+            "type": "CPF",
+            "number": "13129851780"
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO*",
+        "transaction_order_id": null,
+        "last_four_digits": "4832",
+        "payment_method_id": "master",
+        "marketplace": "NONE",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": "https://api.awsli.com.br/pagador/meio-pagamento/mptransparente/retorno/176321/notificacao?referencia=168"
+      }
+    },
+    {
+      "collection": {
+        "id": 1278823281,
+        "site_id": "MLB",
+        "date_created": "2015-08-20T16:17:55.000-04:00",
+        "date_approved": null,
+        "last_modified": "2015-08-20T16:17:55.000-04:00",
+        "money_release_date": null,
+        "operation_type": "payment_addition",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": null,
+          "first_name": null,
+          "last_name": null,
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": null,
+          "id": 74408458,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "987941323",
+        "merchant_order_id": null,
+        "reason": "Dinheiro adicionado para Topo De Bolo Acrílico Espelhado Personalizado Festa 15 Anos",
+        "currency_id": "BRL",
+        "transaction_amount": 18,
+        "total_paid_amount": 18,
+        "shipping_cost": 0,
+        "account_money_amount": 0,
+        "mercadopago_fee": null,
+        "net_received_amount": null,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "pending",
+        "status_detail": "pending_waiting_payment",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "ticket",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "bolbradesco",
+        "marketplace": "MELI",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1278811104,
+        "site_id": "MLB",
+        "date_created": "2015-08-20T15:29:26.000-04:00",
+        "date_approved": null,
+        "last_modified": "2015-08-20T15:29:26.000-04:00",
+        "money_release_date": null,
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": null,
+          "first_name": null,
+          "last_name": null,
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": null,
+          "id": 176157819,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988856010",
+        "merchant_order_id": null,
+        "reason": "Porta Medalhas Personalizado Com Nome Suporte Corrida Cooper",
+        "currency_id": "BRL",
+        "transaction_amount": 52.1,
+        "total_paid_amount": 67.34,
+        "shipping_cost": 15.24,
+        "account_money_amount": 0,
+        "mercadopago_fee": null,
+        "net_received_amount": null,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "pending",
+        "status_detail": "pending_waiting_payment",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "ticket",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "bolbradesco",
+        "marketplace": "MELI",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1278912869,
+        "site_id": "MLB",
+        "date_created": "2015-08-20T12:48:04.000-04:00",
+        "date_approved": "2015-08-20T12:48:04.000-04:00",
+        "last_modified": "2015-08-20T12:48:33.000-04:00",
+        "money_release_date": "2015-09-10T12:48:04.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "VITORNASCIII",
+          "first_name": "vitor",
+          "last_name": "nascimento",
+          "phone": {
+            "area_code": "32",
+            "number": "9947-9294",
+            "extension": null
+          },
+          "email": "vitor.b.nascimento@msn.com",
+          "id": 137694646,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988782410",
+        "merchant_order_id": null,
+        "reason": "1 Chaveiro Game Of Thrones Mdf Exclusivo",
+        "currency_id": "BRL",
+        "transaction_amount": 4.31,
+        "total_paid_amount": 18.21,
+        "shipping_cost": 13.9,
+        "account_money_amount": 0,
+        "mercadopago_fee": 14.59,
+        "net_received_amount": 3.62,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": 0,
+        "coupon_fee": 0,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "account_money",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "account_money",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1278472606,
+        "site_id": "MLB",
+        "date_created": "2015-08-20T09:55:59.000-04:00",
+        "date_approved": null,
+        "last_modified": "2015-08-20T09:55:59.000-04:00",
+        "money_release_date": null,
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": null,
+          "first_name": null,
+          "last_name": null,
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": null,
+          "id": 134171400,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988701880",
+        "merchant_order_id": null,
+        "reason": "Porta Medalhas Jiu Jitsu Personalizado Com Nome",
+        "currency_id": "BRL",
+        "transaction_amount": 52.1,
+        "total_paid_amount": 59.71,
+        "shipping_cost": 7.61,
+        "account_money_amount": 0,
+        "mercadopago_fee": null,
+        "net_received_amount": null,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "pending",
+        "status_detail": "pending_waiting_payment",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "ticket",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "bolbradesco",
+        "marketplace": "MELI",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1278471699,
+        "site_id": "MLB",
+        "date_created": "2015-08-20T09:52:38.000-04:00",
+        "date_approved": "2015-08-20T09:52:38.000-04:00",
+        "last_modified": "2015-08-20T09:52:38.000-04:00",
+        "money_release_date": "2015-09-10T09:52:38.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "@190595187",
+          "first_name": "Katia",
+          "last_name": "Rodrigues",
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": "katiar3@yahoo.com.br",
+          "id": 190595187,
+          "identification": {
+            "type": "CPF",
+            "number": "44274050106"
+          }
+        },
+        "external_reference": "166",
+        "merchant_order_id": null,
+        "reason": "Pagamento do pedido 166 na Loja BrasilLaser Ateliê de Personalizados",
+        "currency_id": "BRL",
+        "transaction_amount": 77,
+        "total_paid_amount": 77,
+        "shipping_cost": 0,
+        "account_money_amount": 0,
+        "mercadopago_fee": 3.84,
+        "net_received_amount": 73.16,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": "00",
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 1,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": "Katia R R Rodrigues",
+          "identification": {
+            "type": "CPF",
+            "number": "44274050106"
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO*",
+        "transaction_order_id": null,
+        "last_four_digits": "7686",
+        "payment_method_id": "visa",
+        "marketplace": "NONE",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": "https://api.awsli.com.br/pagador/meio-pagamento/mptransparente/retorno/176321/notificacao?referencia=166"
+      }
+    },
+    {
+      "collection": {
+        "id": 1278240091,
+        "site_id": "MLB",
+        "date_created": "2015-08-19T21:54:38.000-04:00",
+        "date_approved": "2015-08-19T21:58:26.000-04:00",
+        "last_modified": "2015-08-20T04:46:23.000-04:00",
+        "money_release_date": "2015-09-09T21:58:26.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "OLJO8494226",
+          "first_name": "Jordana",
+          "last_name": "Oliveira",
+          "phone": {
+            "area_code": null,
+            "number": "34 92409680",
+            "extension": null
+          },
+          "email": "joor_louise@hotmail.com",
+          "id": 186069720,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988588807",
+        "merchant_order_id": null,
+        "reason": "Topo Bolo Acrílico Espelhado Personalizado Casamento Noivado",
+        "currency_id": "BRL",
+        "transaction_amount": 61.99,
+        "total_paid_amount": 76.47,
+        "shipping_cost": 14.48,
+        "account_money_amount": 0,
+        "mercadopago_fee": 24.4,
+        "net_received_amount": 52.07,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": "0",
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 1,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": "Jordana S Oliveira",
+          "identification": {
+            "type": "CPF",
+            "number": "03830601174"
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO",
+        "transaction_order_id": null,
+        "last_four_digits": "5593",
+        "payment_method_id": "visa",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1278173179,
+        "site_id": "MLB",
+        "date_created": "2015-08-19T18:31:10.000-04:00",
+        "date_approved": "2015-08-20T15:38:43.000-04:00",
+        "last_modified": "2015-08-20T15:38:43.000-04:00",
+        "money_release_date": "2015-09-10T15:38:43.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "MATHEUSSUZANA",
+          "first_name": "SUZANA",
+          "last_name": "MATHEUS",
+          "phone": {
+            "area_code": null,
+            "number": "11947191844",
+            "extension": null
+          },
+          "email": "suzy.daiane@hotmail.com",
+          "id": 172432534,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988510510",
+        "merchant_order_id": null,
+        "reason": "Topo Bolo Acrílico Espelhado Personalizado Casamento Noivado",
+        "currency_id": "BRL",
+        "transaction_amount": 61.99,
+        "total_paid_amount": 77.23,
+        "shipping_cost": 15.24,
+        "account_money_amount": 0,
+        "mercadopago_fee": 15.24,
+        "net_received_amount": 61.99,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": 0,
+        "coupon_fee": 0,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "ticket",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "bolbradesco",
+        "marketplace": "MELI",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1277842673,
+        "site_id": "MLB",
+        "date_created": "2015-08-19T12:53:29.000-04:00",
+        "date_approved": null,
+        "last_modified": "2015-08-19T12:53:44.000-04:00",
+        "money_release_date": null,
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": null,
+          "first_name": null,
+          "last_name": null,
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": null,
+          "id": 172002924,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988361064",
+        "merchant_order_id": null,
+        "reason": "Topo De Bolo Mdf Iniciais Personalizado Casamento Noivado",
+        "currency_id": "BRL",
+        "transaction_amount": 36.99,
+        "total_paid_amount": 57.4,
+        "shipping_cost": 20.41,
+        "account_money_amount": 0,
+        "mercadopago_fee": null,
+        "net_received_amount": null,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "rejected",
+        "status_detail": "cc_rejected_call_for_authorize",
+        "status_code": "05",
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 4,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": "Samara Silva De Oliveira",
+          "identification": {
+            "type": "CPF",
+            "number": "10808591444"
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO*MLIVRE",
+        "transaction_order_id": null,
+        "last_four_digits": "3117",
+        "payment_method_id": "master",
+        "marketplace": "MELI",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1277335101,
+        "site_id": "MLB",
+        "date_created": "2015-08-19T07:36:38.000-04:00",
+        "date_approved": "2015-08-19T07:36:38.000-04:00",
+        "last_modified": "2015-08-19T08:22:47.000-04:00",
+        "money_release_date": "2015-09-09T07:36:38.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "DBORADEJESUSOLIVEIRA",
+          "first_name": "Débora",
+          "last_name": "de Jesus Oliveira",
+          "phone": {
+            "area_code": null,
+            "number": "11 985173276",
+            "extension": null
+          },
+          "email": "dezinha_olivera@hotmail.com",
+          "id": 178947899,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988227863",
+        "merchant_order_id": null,
+        "reason": "Topo De Bolo Acrílico Espelhado Personalizado Festa 15 Anos",
+        "currency_id": "BRL",
+        "transaction_amount": 61.99,
+        "total_paid_amount": 77.23,
+        "shipping_cost": 15.24,
+        "account_money_amount": 0,
+        "mercadopago_fee": 25.16,
+        "net_received_amount": 52.07,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": 0,
+        "coupon_fee": 0,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 3,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO*MLIVRE",
+        "transaction_order_id": null,
+        "last_four_digits": "5546",
+        "payment_method_id": "master",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1277147477,
+        "site_id": "MLB",
+        "date_created": "2015-08-18T23:35:42.000-04:00",
+        "date_approved": "2015-08-18T23:35:42.000-04:00",
+        "last_modified": "2015-08-18T23:37:12.000-04:00",
+        "money_release_date": "2015-09-08T23:35:42.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "NUMA2452164",
+          "first_name": "Marcia",
+          "last_name": "Nunes da Silva",
+          "phone": {
+            "area_code": null,
+            "number": "21 35913828",
+            "extension": null
+          },
+          "email": "mnsenf@hotmail.com",
+          "id": 180295657,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988191811",
+        "merchant_order_id": null,
+        "reason": "Suporte Base Bolo Carruagem Princesa Festa Aniversário Mdf",
+        "currency_id": "BRL",
+        "transaction_amount": 50.48,
+        "total_paid_amount": 63.39,
+        "shipping_cost": 12.91,
+        "account_money_amount": 0,
+        "mercadopago_fee": 20.99,
+        "net_received_amount": 42.4,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": 0,
+        "coupon_fee": 0,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 2,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO*MLIVRE",
+        "transaction_order_id": null,
+        "last_four_digits": "9789",
+        "payment_method_id": "master",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1277383297,
+        "site_id": "MLB",
+        "date_created": "2015-08-18T20:20:33.000-04:00",
+        "date_approved": "2015-08-18T20:22:06.000-04:00",
+        "last_modified": "2015-08-18T20:22:37.000-04:00",
+        "money_release_date": "2015-09-08T20:22:06.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "ELETROCELL2",
+          "first_name": "ALDEMAR",
+          "last_name": "AMORIM DE ALMEIDA",
+          "phone": {
+            "area_code": "94",
+            "number": "81613320",
+            "extension": null
+          },
+          "email": "vendas.bvcel@hotmail.com",
+          "id": 18945260,
+          "identification": {
+            "type": "CPF",
+            "number": "64884929268"
+          }
+        },
+        "external_reference": "988124203",
+        "merchant_order_id": null,
+        "reason": "Topo Bolo Acrílico Espelhado Personalizado Casamento Noivado",
+        "currency_id": "BRL",
+        "transaction_amount": 61.99,
+        "total_paid_amount": 87.02,
+        "shipping_cost": 25.03,
+        "account_money_amount": 0,
+        "mercadopago_fee": 34.95,
+        "net_received_amount": 52.07,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": 0,
+        "coupon_fee": 0,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 12,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO",
+        "transaction_order_id": null,
+        "last_four_digits": "8060",
+        "payment_method_id": "visa",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1276746280,
+        "site_id": "MLB",
+        "date_created": "2015-08-18T13:33:02.000-04:00",
+        "date_approved": "2015-08-20T08:57:10.000-04:00",
+        "last_modified": "2015-08-20T10:45:59.000-04:00",
+        "money_release_date": "2015-09-10T08:57:10.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "IRI_CMS",
+          "first_name": "iris",
+          "last_name": "cms",
+          "phone": {
+            "area_code": "21",
+            "number": "78542369",
+            "extension": null
+          },
+          "email": "iriscms@oi.com.br",
+          "id": 74408458,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "987941323",
+        "merchant_order_id": null,
+        "reason": "Topo De Bolo Acrílico Espelhado Personalizado Festa 15 Anos",
+        "currency_id": "BRL",
+        "transaction_amount": 61.99,
+        "total_paid_amount": 71.04,
+        "shipping_cost": 9.05,
+        "account_money_amount": 0,
+        "mercadopago_fee": 18.97,
+        "net_received_amount": 52.07,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "ticket",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "bolbradesco",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1276712325,
+        "site_id": "MLB",
+        "date_created": "2015-08-18T12:11:49.000-04:00",
+        "date_approved": "2015-08-18T12:11:40.000-04:00",
+        "last_modified": "2015-08-18T12:27:59.000-04:00",
+        "money_release_date": "2015-09-08T12:11:40.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "MAYBV",
+          "first_name": "Mayane",
+          "last_name": "Vasconcelos",
+          "phone": {
+            "area_code": "27",
+            "number": "81379887",
+            "extension": null
+          },
+          "email": "batgirlm@hotmail.com",
+          "id": 91346393,
+          "identification": {
+            "type": null,
+            "number": "10977728706"
+          }
+        },
+        "external_reference": "987901892",
+        "merchant_order_id": null,
+        "reason": "Cabide De Noivos Para Casamento Personalizado Mdf Noiva",
+        "currency_id": "BRL",
+        "transaction_amount": 38.78,
+        "total_paid_amount": 53.44,
+        "shipping_cost": 14.66,
+        "account_money_amount": 0,
+        "mercadopago_fee": 20.87,
+        "net_received_amount": 32.57,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": 0,
+        "coupon_fee": 0,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 2,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO",
+        "transaction_order_id": null,
+        "last_four_digits": "7571",
+        "payment_method_id": "visa",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1276693896,
+        "site_id": "MLB",
+        "date_created": "2015-08-18T11:17:54.000-04:00",
+        "date_approved": null,
+        "last_modified": "2015-08-18T11:17:53.000-04:00",
+        "money_release_date": null,
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": null,
+          "first_name": null,
+          "last_name": null,
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": null,
+          "id": 190431800,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "987875907",
+        "merchant_order_id": null,
+        "reason": "Topo De Bolo Mdf Iniciais Personalizado Casamento Noivado",
+        "currency_id": "BRL",
+        "transaction_amount": 36.99,
+        "total_paid_amount": 54.83,
+        "shipping_cost": 17.84,
+        "account_money_amount": 0,
+        "mercadopago_fee": null,
+        "net_received_amount": null,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "pending",
+        "status_detail": "pending_waiting_payment",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "ticket",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "bolbradesco",
+        "marketplace": "MELI",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1276434680,
+        "site_id": "MLB",
+        "date_created": "2015-08-17T23:24:36.000-04:00",
+        "date_approved": "2015-08-19T10:58:37.000-04:00",
+        "last_modified": "2015-08-19T11:21:37.000-04:00",
+        "money_release_date": "2015-09-09T10:58:37.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "ALLISSONFOSANTOS",
+          "first_name": "Allisson",
+          "last_name": "Santos",
+          "phone": {
+            "area_code": "82",
+            "number": "996050804",
+            "extension": null
+          },
+          "email": "allissonflavio@gmail.com",
+          "id": 32035656,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "987751878",
+        "merchant_order_id": null,
+        "reason": "Porta Medalhas Futebol Futsal Personalizado Com Nome Suporte",
+        "currency_id": "BRL",
+        "transaction_amount": 52.1,
+        "total_paid_amount": 71.7,
+        "shipping_cost": 19.6,
+        "account_money_amount": 0,
+        "mercadopago_fee": 27.94,
+        "net_received_amount": 43.76,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": 0,
+        "coupon_fee": 0,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "ticket",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "bolbradesco",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    }
+  ]
+}
