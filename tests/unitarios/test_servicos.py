@@ -184,18 +184,304 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.processa_dados_pagamento()
         entregador.identificacao_pagamento.should.be.equal('transacao-id')
 
+RESULTADO_TRANSACOES = """
+{
+  "paging": {
+    "total": 16,
+    "limit": 1000,
+    "offset": 0
+  },
+  "results": [
+    {
+      "collection": {
+        "id": 1278823433,
+        "site_id": "MLB",
+        "date_created": "2015-08-20T16:18:29.000-04:00",
+        "date_approved": "2015-08-20T16:18:29.000-04:00",
+        "last_modified": "2015-08-20T16:18:29.000-04:00",
+        "money_release_date": "2015-09-10T16:18:29.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "@190628696",
+          "first_name": "Camila",
+          "last_name": "Barbosa",
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": "camilinha.fjv4@gmail.com",
+          "id": 190628696,
+          "identification": {
+            "type": "CPF",
+            "number": "13129851780"
+          }
+        },
+        "external_reference": "168",
+        "merchant_order_id": null,
+        "reason": "Pagamento do pedido 168 na Loja BrasilLaser Ateliê de Personalizados",
+        "currency_id": "BRL",
+        "transaction_amount": 77,
+        "total_paid_amount": 79.32,
+        "shipping_cost": 0,
+        "account_money_amount": 0,
+        "mercadopago_fee": 3.84,
+        "net_received_amount": 73.16,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": "00",
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 2,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": "Kamila s nascimento",
+          "identification": {
+            "type": "CPF",
+            "number": "13129851780"
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO*",
+        "transaction_order_id": null,
+        "last_four_digits": "4832",
+        "payment_method_id": "master",
+        "marketplace": "NONE",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": "https://api.awsli.com.br/pagador/meio-pagamento/mptransparente/retorno/176321/notificacao?referencia=168"
+      }
+    },
+    {
+      "collection": {
+        "id": 1278471699,
+        "site_id": "MLB",
+        "date_created": "2015-08-20T09:52:38.000-04:00",
+        "date_approved": "2015-08-20T09:52:38.000-04:00",
+        "last_modified": "2015-08-20T09:52:38.000-04:00",
+        "money_release_date": "2015-09-10T09:52:38.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "@190595187",
+          "first_name": "Katia",
+          "last_name": "Rodrigues",
+          "phone": {
+            "area_code": null,
+            "number": null,
+            "extension": null
+          },
+          "email": "katiar3@yahoo.com.br",
+          "id": 190595187,
+          "identification": {
+            "type": "CPF",
+            "number": "44274050106"
+          }
+        },
+        "external_reference": "166",
+        "merchant_order_id": null,
+        "reason": "Pagamento do pedido 166 na Loja BrasilLaser Ateliê de Personalizados",
+        "currency_id": "BRL",
+        "transaction_amount": 77,
+        "total_paid_amount": 77,
+        "shipping_cost": 0,
+        "account_money_amount": 0,
+        "mercadopago_fee": 3.84,
+        "net_received_amount": 73.16,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": "00",
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 1,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": "Katia R R Rodrigues",
+          "identification": {
+            "type": "CPF",
+            "number": "44274050106"
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO*",
+        "transaction_order_id": null,
+        "last_four_digits": "7686",
+        "payment_method_id": "visa",
+        "marketplace": "NONE",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": "https://api.awsli.com.br/pagador/meio-pagamento/mptransparente/retorno/176321/notificacao?referencia=166"
+      }
+    },
+    {
+      "collection": {
+        "id": 1278240091,
+        "site_id": "MLB",
+        "date_created": "2015-08-19T21:54:38.000-04:00",
+        "date_approved": "2015-08-19T21:58:26.000-04:00",
+        "last_modified": "2015-08-20T04:46:23.000-04:00",
+        "money_release_date": "2015-09-09T21:58:26.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "OLJO8494226",
+          "first_name": "Jordana",
+          "last_name": "Oliveira",
+          "phone": {
+            "area_code": null,
+            "number": "34 92409680",
+            "extension": null
+          },
+          "email": "joor_louise@hotmail.com",
+          "id": 186069720,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988588807",
+        "merchant_order_id": null,
+        "reason": "Topo Bolo Acrílico Espelhado Personalizado Casamento Noivado",
+        "currency_id": "BRL",
+        "transaction_amount": 61.99,
+        "total_paid_amount": 76.47,
+        "shipping_cost": 14.48,
+        "account_money_amount": 0,
+        "mercadopago_fee": 24.4,
+        "net_received_amount": 52.07,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": null,
+        "coupon_fee": null,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": "0",
+        "released": "no",
+        "payment_type": "credit_card",
+        "installments": 1,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": "Jordana S Oliveira",
+          "identification": {
+            "type": "CPF",
+            "number": "03830601174"
+          }
+        },
+        "statement_descriptor": "MERCADOPAGO",
+        "transaction_order_id": null,
+        "last_four_digits": "5593",
+        "payment_method_id": "visa",
+        "marketplace": "MELI",
+        "tags": [
+          "new"
+        ],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    },
+    {
+      "collection": {
+        "id": 1278173179,
+        "site_id": "MLB",
+        "date_created": "2015-08-19T18:31:10.000-04:00",
+        "date_approved": "2015-08-20T15:38:43.000-04:00",
+        "last_modified": "2015-08-20T15:38:43.000-04:00",
+        "money_release_date": "2015-09-10T15:38:43.000-04:00",
+        "operation_type": "regular_payment",
+        "collector_id": 129324129,
+        "sponsor_id": null,
+        "payer": {
+          "nickname": "MATHEUSSUZANA",
+          "first_name": "SUZANA",
+          "last_name": "MATHEUS",
+          "phone": {
+            "area_code": null,
+            "number": "11947191844",
+            "extension": null
+          },
+          "email": "suzy.daiane@hotmail.com",
+          "id": 172432534,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "external_reference": "988510510",
+        "merchant_order_id": null,
+        "reason": "Topo Bolo Acrílico Espelhado Personalizado Casamento Noivado",
+        "currency_id": "BRL",
+        "transaction_amount": 61.99,
+        "total_paid_amount": 77.23,
+        "shipping_cost": 15.24,
+        "account_money_amount": 0,
+        "mercadopago_fee": 15.24,
+        "net_received_amount": 61.99,
+        "marketplace_fee": null,
+        "coupon_id": null,
+        "coupon_amount": 0,
+        "coupon_fee": 0,
+        "finance_fee": 0,
+        "status": "approved",
+        "status_detail": "accredited",
+        "status_code": null,
+        "released": "no",
+        "payment_type": "ticket",
+        "installments": null,
+        "installment_amount": null,
+        "deferred_period": null,
+        "cardholder": {
+          "name": null,
+          "identification": {
+            "type": null,
+            "number": null
+          }
+        },
+        "statement_descriptor": null,
+        "last_four_digits": null,
+        "payment_method_id": "bolbradesco",
+        "marketplace": "MELI",
+        "tags": [],
+        "refunds": [],
+        "amount_refunded": 0,
+        "notification_url": null
+      }
+    }
+  ]
+}"""
+
 
 class MPTransparenteAtualizaTransacoes(unittest.TestCase):
     @mock.patch('pagador_mercadopago_transparente.servicos.AtualizaTransacoes.obter_conexao')
     def test_monta_consulta_corretamente(self, obter_con_mock):
         atualizador = servicos.AtualizaTransacoes(1234, dados={'data_inicial': '2015-08-22', 'data_final': '2015-08-23'})
         atualizador.consulta_transacoes()
-        obter_con_mock.return_value.get.assert_called_with('https://api.mercadopago.com/collections/search', dados={'sort': 'date_created', 'begin_date': '2015-08-22T00:00', 'end_date': '2015-08-23T23:59', 'range': 'date_created', 'limit': 1000, 'criteria': 'desc'})
+        obter_con_mock.return_value.get.assert_called_with('https://api.mercadopago.com/collections/search', dados={'sort': 'date_created', 'begin_date': '2015-08-22T00:00:00Z', 'end_date': '2015-08-23T23:59:59Z', 'range': 'date_created', 'limit': 1000, 'criteria': 'desc'})
 
     @mock.patch('pagador_mercadopago_transparente.servicos.AtualizaTransacoes.obter_conexao', mock.MagicMock)
     def test_resultado_com_erro(self):
         atualizador = servicos.AtualizaTransacoes(1234, dados={'data_inicial': '2015-08-22', 'data_final': '2015-08-23'})
-        atualizador.resposta = mock.MagicMock(sucesso=False, conteudo={'message': 'invalid_token', 'cause': [0], 'error': 'not_found','status': 401})
+        atualizador.resposta = mock.MagicMock(sucesso=False, nao_autorizado=False, nao_autenticado=False, conteudo={'message': 'invalid_token', 'cause': [0], 'error': 'not_found','status': 401})
         atualizador.analisa_resultado_transacoes()
         atualizador.dados_pedido.should.be.empty
         atualizador.erros.should.be.equal({'cause': [0], 'error': 'not_found', 'message': 'invalid_token', 'status': 401})
@@ -203,7 +489,7 @@ class MPTransparenteAtualizaTransacoes(unittest.TestCase):
     @mock.patch('pagador_mercadopago_transparente.servicos.AtualizaTransacoes.obter_conexao', mock.MagicMock)
     def test_resultado_com_erro(self):
         atualizador = servicos.AtualizaTransacoes(1234, dados={'data_inicial': '2015-08-22', 'data_final': '2015-08-23'})
-        atualizador.resposta = mock.MagicMock(sucesso=False, conteudo={'message': 'invalid_token', 'cause': [0], 'error': 'not_found','status': 401})
+        atualizador.resposta = mock.MagicMock(sucesso=False, nao_autorizado=False, nao_autenticado=False, conteudo={'message': 'invalid_token', 'cause': [0], 'error': 'not_found','status': 401})
         atualizador.analisa_resultado_transacoes()
         atualizador.dados_pedido.should.be.empty
         atualizador.erros.should.be.equal({'cause': [0], 'error': 'not_found', 'message': 'invalid_token', 'status': 401})
@@ -211,7 +497,7 @@ class MPTransparenteAtualizaTransacoes(unittest.TestCase):
     @mock.patch('pagador_mercadopago_transparente.servicos.AtualizaTransacoes.obter_conexao', mock.MagicMock)
     def test_resultado_com_dados_de_pedido(self):
         atualizador = servicos.AtualizaTransacoes(1234, dados={'data_inicial': '2015-08-22', 'data_final': '2015-08-23'})
-        conteudo = json.load(open(os.path.join(os.path.abspath(os.path.curdir), 'unitarios', 'reposta_consulta_transacoes.json')))
+        conteudo = json.loads(RESULTADO_TRANSACOES)
         atualizador.resposta = mock.MagicMock(sucesso=True, conteudo=conteudo)
         atualizador.analisa_resultado_transacoes()
         atualizador.dados_pedido.should.be.equal([{'situacao_pedido': 4, 'pedido_numero': u'168'}, {'situacao_pedido': 4, 'pedido_numero': u'166'}])

@@ -176,6 +176,33 @@ MENSAGENS_RETORNO = {
 }
 
 
+class AtualizadorAccessToken(object):
+    def __init__(self):
+        self.configuracao = None
+        self.conexao = None
+        self.tentativa = 1
+        self.tentativa_maxima = 2
+
+    def define_configuracao_e_conexao(self, servico):
+        self.configuracao = servico.configuracao
+        self.conexao = servico.conexao
+
+    def deve_reenviar(self, resposta):
+        self.tentativa += 1
+        deve = 1 < self.tentativa <= self.tentativa_maxima and (
+            resposta.conteudo.get('message', '') in ['expired_token', 'invalid_token'] or
+            resposta.conteudo.get('error', '') == 'invalid_access_token'
+        )
+        if deve:
+            self.atualiza_credenciais()
+        return deve
+
+    def atualiza_credenciais(self):
+        self.configuracao.instalar({'fase_atual': '2', 'tipo': 'atualizar', 'codigo_autorizacao': self.configuracao.codigo_autorizacao})
+        self.conexao.credenciador.configuracao = self.configuracao
+        self.conexao.credenciador.atualiza_credenciais()
+
+
 class EntregaPagamento(servicos.EntregaPagamento):
     def __init__(self, loja_id, plano_indice=1, dados=None):
         super(EntregaPagamento, self).__init__(loja_id, plano_indice, dados=dados)
@@ -413,13 +440,14 @@ class AtualizaTransacoes(servicos.AtualizaTransacoes):
         super(AtualizaTransacoes, self).__init__(loja_id, dados)
         self.url = 'https://api.mercadopago.com/collections/search'
         self.conexao = self.obter_conexao(formato_envio=requisicao.Formato.querystring)
+        self.atualizador_credenciais = AtualizadorAccessToken()
 
     def define_credenciais(self):
         self.conexao.credenciador = Credenciador(configuracao=self.configuracao)
 
     def _gera_dados_envio(self):
-        initial_date = '{}T00:00'.format(self.dados['data_inicial'])
-        final_date = '{}T23:59'.format(self.dados['data_final'])
+        initial_date = '{}T00:00:00Z'.format(self.dados['data_inicial'])
+        final_date = '{}T23:59:59Z'.format(self.dados['data_final'])
         return {
             'criteria': 'desc',
             'sort': 'date_created',
@@ -430,6 +458,10 @@ class AtualizaTransacoes(servicos.AtualizaTransacoes):
         }
 
     def consulta_transacoes(self):
+        self.atualizador_credenciais.define_configuracao_e_conexao(self)
+        self._obtem_resposta()
+
+    def _obtem_resposta(self):
         self.dados_enviados = self._gera_dados_envio()
         self.resposta = self.conexao.get(self.url, dados=self.dados_enviados)
 
@@ -444,6 +476,10 @@ class AtualizaTransacoes(servicos.AtualizaTransacoes):
                         'situacao_pedido': SituacoesDePagamento.do_tipo(transacao['status']),
                         'pedido_numero': transacao['external_reference']
                     })
+        elif self.resposta.nao_autenticado or self.resposta.nao_autorizado:
+            if self.atualizador_credenciais.deve_reenviar(self.resposta):
+                self._obtem_resposta()
+                self.analisa_resultado_transacoes()
         else:
             if 'error' in self.resposta.conteudo:
                 self.erros = self.resposta.conteudo
