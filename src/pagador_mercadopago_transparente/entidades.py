@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pagador import settings, entidades
+from pagador import configuracoes, entidades
 from pagador_mercadopago_transparente import cadastro
 
 CODIGO_GATEWAY = 14
@@ -68,7 +68,7 @@ class Malote(entidades.Malote):
         self.card_token_id = dados_pagamento['cartao']
         self.payer_email = pedido.cliente['email']
         self.external_reference = pedido.numero
-        notification_url = settings.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
+        notification_url = configuracoes.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
         self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
         self.customer = Cliente(
             email=self._pedido.cliente['email'],
