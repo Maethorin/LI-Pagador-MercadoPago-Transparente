@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from li_common.comunicacao import requisicao
 
-from pagador import settings, servicos
+from pagador import configuracoes, servicos
 
 
 TEMPO_MAXIMO_ESPERA_NOTIFICACAO = 30
@@ -38,7 +38,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         dados = {
             'response_type': 'code',
             'client_id': self.client_id,
-            'redirect_uri': '{}?{}'.format(settings.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
+            'redirect_uri': '{}?{}'.format(configuracoes.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
         }
         return 'http://auth.mercadolivre.com.br/authorization?{}'.format(urlencode(dados))
 
@@ -60,7 +60,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
             'grant_type': TipoToken.authorization_code,
             'client_id': self.client_id,
             'client_secret': self.client_secret,
-            'redirect_uri': '{}?{}'.format(settings.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
+            'redirect_uri': '{}?{}'.format(configuracoes.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
         }
 
     @property
