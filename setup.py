@@ -46,13 +46,11 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Internet",
     ],
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    include_package_data=True,
     install_requires=['distribute', 'li-pagador'],
 )
