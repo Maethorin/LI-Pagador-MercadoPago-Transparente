@@ -126,7 +126,8 @@ class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
         self.eh_gateway = True
         super(ConfiguracaoMeioPagamento, self).__init__(loja_id, codigo_pagamento, eh_listagem=eh_listagem)
         self.exige_https = True
-        self.src_js_sdk = 'https://secure.mlstatic.com/org-img/checkout/custom/1.0/checkout.js'
+        self.src_js_sdk = 'https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js'
+        # self.src_js_sdk = 'https://secure.mlstatic.com/org-img/checkout/custom/1.0/checkout.js'
         parametros = entidades.ParametrosDeContrato(loja_id).obter_para(self.extensao)
         self.public_key = parametros['public_key']
         self.parcelas_por_bandeira = {
