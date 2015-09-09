@@ -58,6 +58,10 @@ com {"site_id":"MLB"}
 
 http://developers.mercadopago.com/documentation/applications
 
+## Removendo permissões:
+
+https://www.mercadopago.com/mlb/account/security/applications/connections
+
 ### Aplicação usada nos testes da LI
 
 APP Local:

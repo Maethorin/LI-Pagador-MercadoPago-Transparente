@@ -94,6 +94,36 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.resposta.should.be.equal(resposta_mock)
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.atualiza_credenciais', mock.MagicMock())
+    def test_deve_reenviar_pagamento_se_tentativa_eh_um(self):
+        entregador = servicos.EntregaPagamento(1234)
+        entregador.malote = mock.MagicMock()
+        entregador.malote.to_dict.return_value = {'zas': 'malote-como-dicionario'}
+        entregador.conexao = mock.MagicMock()
+        entregador.pedido = mock.MagicMock(situacao_id=None)
+        entregador.dados = {'next_url': 'zas'}
+        resposta_mock = mock.MagicMock(nao_autorizado=True, nao_autenticado=False, conteudo={'message': 'invalid_token'})
+        entregador.conexao.post.return_value = resposta_mock
+        entregador.envia_pagamento.when.called_with().should.throw(
+            entregador.EnvioNaoRealizado
+        )
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.atualiza_credenciais', mock.MagicMock())
+    def test_deve_nao_reenviar_pagamento_se_tentativa_eh_dois(self):
+        entregador = servicos.EntregaPagamento(1234)
+        entregador.malote = mock.MagicMock()
+        entregador.malote.to_dict.return_value = {'zas': 'malote-como-dicionario'}
+        entregador.conexao = mock.MagicMock()
+        entregador.pedido = mock.MagicMock(situacao_id=None)
+        entregador.dados = {'next_url': 'zas'}
+        resposta_mock = mock.MagicMock(nao_autorizado=True, nao_autenticado=False, conteudo={'message': 'invalid_token'})
+        entregador.conexao.post.return_value = resposta_mock
+        entregador.envia_pagamento.when.called_with(tentativa=2).should_not.throw(
+            entregador.EnvioNaoRealizado
+        )
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     def test_deve_usar_post_ao_enviar_pagamento(self):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
         entregador.malote = mock.MagicMock()
