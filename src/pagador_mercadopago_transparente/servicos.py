@@ -98,14 +98,6 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         url_base = 'https://api.mercadolibre.com/users/{}/applications/{}?access_token={}'
         url = url_base.format(dados['usuario'], self.client_id, dados['token'])
         resposta = self.conexao.delete(url)
-        if resposta.nao_autorizado:
-            self.dados['tipo'] = 'atualizar'
-            try:
-                dados_atualizados = self.obter_dados()
-            except self.InstalacaoNaoFinalizada:
-                raise self.InstalacaoNaoFinalizada(u'Erro de validação de dados junto ao MercadoPago', status=401)
-            url = url_base.format(dados['usuario'], self.client_id, dados_atualizados['token'])
-            resposta = self.conexao.delete(url)
         if resposta.sucesso:
             return u'Aplicação removida com sucesso'
         return u'Desinstalação foi feita com sucesso, mas a aplicação não foi removida do MercadoPago. Você precisará <a href="https://www.mercadopago.com/mlb/account/security/applications/connections" _target="blank">remover manualmente</a>.'
