@@ -32,27 +32,32 @@ com {"site_id":"MLB"}
 
 ### Usuários criados pela LI
 
-#### Dono App:
-
-    "id": 177542381,
-    "nickname": "TETE471708",
-    "password": "qatest5831",
-    "site_status": "active",
-    "email": "test_user_67663769@testuser.com"
-
-#### Lojista:
-    "id": 177547755,
-    "nickname": "TETE6250322",
-    "password": "qatest9348",
-    "site_status": "active",
-    "email": "test_user_93393920@testuser.com"
-
-#### Comprador:
-    "id": 177545914,
-    "nickname": "TETE5430138",
-    "password": "qatest700",
-    "site_status": "active",
-    "email": "test_user_28840237@testuser.com"
+ [
+    {
+        "id": 192273789,
+        "nickname": "TETE3535964",
+        "password": "qatest9936",
+        "site_status": "active",
+        "email": "test_user_53308633@testuser.com",
+        "descricao": "admin"
+    },
+    {
+        "id": 192275808,
+        "nickname": "TETE3981515",
+        "password": "qatest8893",
+        "site_status": "active",
+        "email": "test_user_65234069@testuser.com",
+        "descricao": "vendedor"
+    },
+    {
+        "id": 192275813,
+        "nickname": "TETE1773031",
+        "password": "qatest1152",
+        "site_status": "active",
+        "email": "test_user_85037308@testuser.com",
+        "descricao": "comprador"
+    }
+]
 
 ## Criando aplicações:
 

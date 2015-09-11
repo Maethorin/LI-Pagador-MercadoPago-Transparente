@@ -42,9 +42,13 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         dados = {
             'response_type': 'code',
             'client_id': self.client_id,
-            'redirect_uri': '{}?{}'.format(configuracoes.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
+            'redirect_uri': '{}?{}'.format(self.instalar_redirect_url, parametros_redirect)
         }
         return 'http://auth.mercadopago.com.br/authorization?{}'.format(urlencode(dados))
+
+    @property
+    def instalar_redirect_url(self):
+        return configuracoes.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente').replace('http://', 'https://')
 
     @property
     def _dados_instalacao(self):
@@ -57,7 +61,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
             'grant_type': TipoToken.authorization_code,
             'client_id': self.client_id,
             'client_secret': self.client_secret,
-            'redirect_uri': '{}?{}'.format(configuracoes.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
+            'redirect_uri': '{}?{}'.format(self.instalar_redirect_url, parametros_redirect)
         }
 
     @property
