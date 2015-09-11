@@ -12,6 +12,9 @@ TEMPO_MAXIMO_ESPERA_NOTIFICACAO = 30
 GATEWAY = 'mptransparente'
 
 
+URL_API_BASE = 'https://api.mercadopago.com'
+
+
 class TipoToken(object):
     authorization_code = 'authorization_code'
     refresh_token = 'refresh_token'
@@ -40,14 +43,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
             'client_id': self.client_id,
             'redirect_uri': '{}?{}'.format(configuracoes.INSTALAR_REDIRECT_URL.format(self.loja_id, 'mptransparente'), parametros_redirect)
         }
-        return 'http://auth.mercadolivre.com.br/authorization?{}'.format(urlencode(dados))
-
-    def obter_user_id(self, access_token):
-        url = 'https://api.mercadolibre.com/users/me?access_token={}'.format(access_token)
-        resposta = self.conexao.get(url)
-        if resposta.sucesso:
-            return resposta.conteudo['id']
-        return None
+        return 'http://auth.mercadopago.com.br/authorization?{}'.format(urlencode(dados))
 
     @property
     def _dados_instalacao(self):
@@ -73,7 +69,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         }
 
     def obter_dados(self):
-        url = 'https://api.mercadolibre.com/oauth/token'
+        url = '{}/oauth/token'.format(URL_API_BASE)
         tipo = self.dados.get('tipo', 'instalar')
         if self.dados.get('error', '') == 'access-denied':
             raise self.InstalacaoNaoFinalizada(u'A autorização foi cancelada no MercadoPago.')
@@ -89,8 +85,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
                 'codigo_autorizacao': resposta.conteudo['refresh_token']
             }
             if tipo == 'instalar':
-                user_id = self.obter_user_id(resposta.conteudo['access_token'])
-                resultado['usuario'] = user_id
+                resultado['usuario'] = resposta.conteudo['user_id']
             return resultado
         raise self.InstalacaoNaoFinalizada(u'Erro ao entrar em contato com o MercadoPago. Código: {}, Resposta: {}'.format(resposta.status_code, resposta.conteudo))
 
@@ -200,7 +195,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
         self.faz_http = True
         self.conexao = self.obter_conexao()
         self.conexao.tenta_outra_vez = False
-        self.url = 'https://api.mercadolibre.com/checkout/custom/create_payment'
+        self.url = '{}/v1/payments'.format(URL_API_BASE)
         self.tentativa = 1
         self.tentativa_maxima = 2
 
@@ -229,6 +224,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
                     servicos.SituacaoPedido.mensagens_complementares(self.pedido.situacao_id)
                 )
             )
+        self.conexao.headers.update({'X-Idempotency-Key': '0000'})
         self.tentativa = tentativa
         if self.tentativa > 1:
             self.atualiza_credenciais()
@@ -276,6 +272,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
 
     def define_dados_pagamento(self):
         self.dados_pagamento = {
+            # TODO: qual o novo ID que eu coloco aq!!!
             'transacao_id': self.resposta.conteudo['payment_id'],
             'valor_pago': self.malote.amount,
             'conteudo_json': {
@@ -428,7 +425,7 @@ class RegistraNotificacao(servicos.RegistraResultado):
 class AtualizaTransacoes(servicos.AtualizaTransacoes):
     def __init__(self, loja_id, dados):
         super(AtualizaTransacoes, self).__init__(loja_id, dados)
-        self.url = 'https://api.mercadopago.com/collections/search'
+        self.url = '{}/collections/search'.format(URL_API_BASE)
         self.conexao = self.obter_conexao(formato_envio=requisicao.Formato.querystring)
         self.atualizador_credenciais = AtualizadorAccessToken()
 

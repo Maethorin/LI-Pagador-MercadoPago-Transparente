@@ -48,7 +48,7 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     def test_deve_definir_url(self):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
-        entregador.url.should.be.equal('https://api.mercadolibre.com/checkout/custom/create_payment')
+        entregador.url.should.be.equal('https://api.mercadopago.com/v1/payments')
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao')
     def test_deve_montar_conexao(self, obter_mock):

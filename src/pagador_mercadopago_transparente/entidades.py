@@ -11,8 +11,12 @@ class PassosDeEnvio(object):
     captura = 'captura'
 
 
+class ClientePagador(entidades.BaseParaPropriedade):
+    _atributos = ['email', 'identification']
+
+
 class Cliente(entidades.BaseParaPropriedade):
-    _atributos = ['email', 'first_name', 'last_name', 'phone', 'identification', 'address', 'registration_date']
+    _atributos = ['first_name', 'last_name', 'phone', 'address', 'registration_date']
 
 
 class Endereco(entidades.BaseParaPropriedade):
@@ -25,6 +29,10 @@ class Telefone(entidades.BaseParaPropriedade):
 
 class Identificacao(entidades.BaseParaPropriedade):
     _atributos = ['type', 'number']
+
+
+class InformacoesAdicionais(entidades.BaseParaPropriedade):
+    _atributos = ['items', 'payer', 'shipments']
 
 
 class Item(entidades.BaseParaPropriedade):
@@ -42,40 +50,37 @@ class EnderecoEntrega(entidades.BaseParaPropriedade):
 class Malote(entidades.Malote):
     def __init__(self, configuracao):
         super(Malote, self).__init__(configuracao)
-        self.amount = 0
-        self.reason = None
-        self.currency_id = 'BRL'
+        self.transaction_amount = 0
+        self.external_reference = None
+        self.description = None
+        self.payer = ClientePagador()
+        self.additional_info = InformacoesAdicionais()
         self.installments = 1
         self.payment_method_id = None
-        self.card_token_id = None
-        self.payer_email = None
-        self.external_reference = None
+        self.token = None
+        self.binary_mode = False
+        self.statement_descriptor = None
+        # self.currency_id = 'BRL'
         self.notification_url = None
-        self.customer = None
-        self.items = None
-        self.shipments = None
         self._pedido = None
 
     def monta_conteudo(self, pedido, parametros_contrato=None, dados=None):
-        self.amount = self.formatador.formata_decimal(pedido.valor_total, como_float=True)
         dados_pagamento = pedido.conteudo_json.get(GATEWAY, {})
         if not dados_pagamento:
             raise self.DadosInvalidos('O pedido não foi montado corretamente no checkout.')
         self._pedido = pedido
-        self.reason = 'Pagamento do pedido {} na Loja {}'.format(pedido.numero, dados_pagamento['nome_loja'].encode("utf8"))
-        self.installments = dados_pagamento.get('parcelas', 1)
-        self.payment_method_id = dados_pagamento['bandeira']
-        self.card_token_id = dados_pagamento['cartao']
-        self.payer_email = pedido.cliente['email']
+        self.transaction_amount = self.formatador.formata_decimal(pedido.valor_total, como_float=True)
         self.external_reference = pedido.numero
-        notification_url = configuracoes.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
-        self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
-        self.customer = Cliente(
-            email=self._pedido.cliente['email'],
+        self.description = 'Pagamento do pedido {} na Loja {}'.format(pedido.numero, dados_pagamento['nome_loja'].encode("utf8"))
+
+        self.payer.email = pedido.cliente['email']
+        self.payer.identification = self._cliente_documento
+
+        self.additional_info.items = self._monta_items()
+        self.additional_info.payer = Cliente(
             first_name=self.formatador.trata_unicode_com_limite(self._pedido.cliente_primeiro_nome),
             last_name=self.formatador.trata_unicode_com_limite(self._pedido.cliente_ultimo_nome),
             phone=self._cliente_telefone,
-            identification=self._cliente_documento,
             address=Endereco(
                 zip_code=self._pedido.endereco_cliente['cep'],
                 street_name=self.formatador.trata_unicode_com_limite(self._pedido.endereco_cliente['endereco']),
@@ -83,7 +88,7 @@ class Malote(entidades.Malote):
             ),
             registration_date=self.formatador.formata_data(self._pedido.cliente['data_criacao'], iso=True)
         )
-        self.shipments = DadosEntrega(
+        self.additional_info.shipments = DadosEntrega(
             receiver_address=EnderecoEntrega(
                 zip_code=self._pedido.endereco_entrega['cep'],
                 street_name=self.formatador.trata_unicode_com_limite(self._pedido.endereco_entrega['endereco']),
@@ -91,7 +96,13 @@ class Malote(entidades.Malote):
                 apartment=self.formatador.trata_unicode_com_limite(self._pedido.endereco_entrega['complemento'])
             )
         )
-        self.items = self._monta_items()
+
+        self.installments = dados_pagamento.get('parcelas', 1)
+        self.payment_method_id = dados_pagamento['bandeira']
+        self.token = dados_pagamento['cartao']
+        notification_url = configuracoes.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
+        self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
+
 
     @property
     def _cliente_telefone(self):

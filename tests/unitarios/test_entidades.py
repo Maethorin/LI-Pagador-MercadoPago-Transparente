@@ -47,6 +47,82 @@ class MPTransparenteConfiguracaoMeioPagamento(unittest.TestCase):
         configuracao.eh_aplicacao.should.be.truthy
 
 
+MALOTE = {
+    "transaction_amount": 1525,
+    "external_reference": "100000024",
+    "description": "Produto teste",
+    "payer": {
+        "email": "test_user_50729992@testuser.com",
+        "identification": {
+            "type": "CPF",
+            "number": "19119119100"
+        }
+    },
+    "additional_info": {
+        "items": [
+            {
+                "id": "0987654",
+                "title": "Produto Teste",
+                "description": "Produto Teste",
+                "picture_url": "http://testdev.xyz/magento1901v6/media/catalog/product/cache/1/image/265x/9df78eab33525d08d6e5fb8d27136e95/images/catalog/product/placeholder/image.jpg",
+                "category_id": "others",
+                "quantity": 5,
+                "unit_price": 300
+            }
+        ],
+        "payer": {
+            "first_name": "Comprador",
+            "last_name": "Brasil",
+            "address": {
+                "zip_code": "06541005",
+                "street_name": "Avenida Marte (Centro de Apoio I)\natp - Santana de Parnaíba - BR",
+                "street_number": 0
+            },
+            "registration_date": "2015-08-24T18:00:26",
+            "phone": {
+                "area_code": "0",
+                "number": "11 3555 1234"
+            }
+        },
+        "shipments": {
+            "receiver_address": {
+                "zip_code": "06541005",
+                "street_name": "Avenida Marte (Centro de Apoio I)\natp - Santana de Parnaíba - BR",
+                "street_number": 0,
+                "floor": "-",
+                "apartment": "-"
+            }
+        }
+    },
+    "installments": 2,
+    "payment_method_id": "visa",
+    "token": "9aae67da7afa2b696d08e5a2eb356fff",
+    "binary_mode": False,
+    "statement_descriptor": "LOJATESTE"
+}
+
+MALOTE_VAZIO = {
+    "transaction_amount": 0,
+    "external_reference": None,
+    "description": None,
+    "payer": {
+        "email": None,
+        "identification": None
+    },
+    "additional_info": {
+        "items": None,
+        "payer": None,
+        "shipments": None
+    },
+    "installments": 1,
+    "payment_method_id": None,
+    "token": None,
+    "binary_mode": False,
+    "statement_descriptor": None,
+    "notification_url": None
+}
+
+
 class MPTransparenteMontandoMalote(unittest.TestCase):
     def __init__(self, methodName='runTest'):
         super(MPTransparenteMontandoMalote, self).__init__(methodName)
@@ -82,25 +158,25 @@ class MPTransparenteMontandoMalote(unittest.TestCase):
         )
 
     def test_malote_deve_ter_propriedades(self):
-        entidades.Malote('configuracao').to_dict().should.be.equal({'amount': 0, 'card_token_id': None, 'currency_id': 'BRL', 'customer': None, 'external_reference': None, 'installments': 1, 'items': None, 'notification_url': None, 'payer_email': None, 'payment_method_id': None, 'reason': None, 'shipments': None})
+        entidades.Malote('configuracao').to_dict().should.be.equal(MALOTE_VAZIO)
 
     def test_deve_montar_conteudo_sem_parcelas(self):
         malote = entidades.Malote(mock.MagicMock(loja_id=8))
         dados = {'passo': 'pre', 'cartao_hash': 'cartao-hash', 'cartao_parcelas': 1}
         parametros = {}
         malote.monta_conteudo(self.pedido, parametros, dados)
-        malote.to_dict().should.be.equal({'amount': 14.0, 'card_token_id': 'zas', 'currency_id': 'BRL', 'customer': {'address': {'street_name': 'Rua Teste', 'street_number': 123, 'zip_code': '10234000'}, 'email': 'email@cliente.com', 'identification': {'number': '12345678901', 'type': 'CNPJ'}, 'phone': {'area_code': '11', 'number': '23456789'}, 'registration_date': '2013-05-01T10:20:00'}, 'external_reference': 123, 'installments': 1, 'items': [{'category_id': 'others', 'description': None, 'id': 'PROD01', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 1', 'unit_price': 40.0}, {'category_id': 'others', 'description': None, 'id': 'PROD02', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 2', 'unit_price': 50.0}], 'notification_url': 'http://localhost:5000/pagador/meio-pagamento/mptransparente/retorno/8/notificacao?referencia=123', 'payer_email': 'email@cliente.com', 'payment_method_id': 'visa', 'reason': 'Pagamento do pedido 123 na Loja Loja ZAS', 'shipments': {'cost': None, 'receiver_address': {'floor': None}}})
+        malote.to_dict().should.be.equal({'additional_info': {'items': [{'category_id': 'others', 'description': None, 'id': 'PROD01', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 1', 'unit_price': 40.0}, {'category_id': 'others', 'description': None, 'id': 'PROD02', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 2', 'unit_price': 50.0}], 'payer': {'address': {'street_name': 'Rua Teste', 'street_number': 123, 'zip_code': '10234000'}, 'phone': {'area_code': '11', 'number': '23456789'}, 'registration_date': '2013-05-01T10:20:00'}, 'shipments': {'cost': None, 'receiver_address': {'floor': None}}}, 'binary_mode': False, 'description': 'Pagamento do pedido 123 na Loja Loja ZAS', 'external_reference': 123, 'installments': 1, 'notification_url': 'http://localhost:5000/pagador/meio-pagamento/mptransparente/retorno/8/notificacao?referencia=123', 'payer': {'email': 'email@cliente.com', 'identification': {'number': '12345678901', 'type': 'CNPJ'}}, 'payment_method_id': 'visa', 'statement_descriptor': None, 'token': 'zas', 'transaction_amount': 14.0})
 
     def test_deve_montar_conteudo_com_parcelas_sem_juros(self):
         malote = entidades.Malote(mock.MagicMock(loja_id=8))
         dados = {'passo': 'pre', 'cartao_hash': 'cartao-hash', 'cartao_parcelas': 3, 'cartao_parcelas_sem_juros': 'true'}
         parametros = {}
         malote.monta_conteudo(self.pedido, parametros, dados)
-        malote.to_dict().should.be.equal({'amount': 14.0, 'card_token_id': 'zas', 'currency_id': 'BRL', 'customer': {'address': {'street_name': 'Rua Teste', 'street_number': 123, 'zip_code': '10234000'}, 'email': 'email@cliente.com', 'identification': {'number': '12345678901', 'type': 'CNPJ'}, 'phone': {'area_code': '11', 'number': '23456789'}, 'registration_date': '2013-05-01T10:20:00'}, 'external_reference': 123, 'installments': 1, 'items': [{'category_id': 'others', 'description': None, 'id': 'PROD01', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 1', 'unit_price': 40.0}, {'category_id': 'others', 'description': None, 'id': 'PROD02', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 2', 'unit_price': 50.0}], 'notification_url': 'http://localhost:5000/pagador/meio-pagamento/mptransparente/retorno/8/notificacao?referencia=123', 'payer_email': 'email@cliente.com', 'payment_method_id': 'visa', 'reason': 'Pagamento do pedido 123 na Loja Loja ZAS', 'shipments': {'cost': None, 'receiver_address': {'floor': None}}})
+        malote.to_dict().should.be.equal({'transaction_amount': 14.0, 'token': 'zas', 'payer': {'email': 'email@cliente.com', 'identification': {'number': '12345678901', 'type': 'CNPJ'}}, 'additional_info': {'items': [{'category_id': 'others', 'description': None, 'id': 'PROD01', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 1', 'unit_price': 40.0}, {'category_id': 'others', 'description': None, 'id': 'PROD02', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 2', 'unit_price': 50.0}], 'payer': {'address': {'street_name': 'Rua Teste', 'street_number': 123, 'zip_code': '10234000'}, 'phone': {'area_code': '11', 'number': '23456789'}, 'registration_date': '2013-05-01T10:20:00'}, 'shipments': {'cost': None, 'receiver_address': {'floor': None}}}, 'external_reference': 123, 'installments': 1, 'notification_url': 'http://localhost:5000/pagador/meio-pagamento/mptransparente/retorno/8/notificacao?referencia=123', 'payment_method_id': 'visa', 'description': 'Pagamento do pedido 123 na Loja Loja ZAS', 'binary_mode': False, 'statement_descriptor': None})
 
     def test_deve_montar_conteudo_com_parcelas_com_juros(self):
         malote = entidades.Malote(mock.MagicMock(loja_id=8))
         dados = {'passo': 'pre', 'cartao_hash': 'cartao-hash', 'customer': {'address': {'complementary': 'Apt 101', 'neighborhood': 'Teste', 'street': 'Rua Teste', 'street_number': 123, 'zipcode': '10234000'}, 'document_number': '12345678901', 'email': 'email@cliente.com', 'name': 'Cliente Teste', 'phone': {'ddd': '11', 'number': '23456789'}}, 'cartao_parcelas': 3, 'cartao_parcelas_sem_juros': 'false', 'metadata': {'carrinho': [{'nome': 'Produto 1', 'preco_venda': 40.0, 'quantidade': 1, 'sku': 'PROD01'}, {'nome': 'Produto 2', 'preco_venda': 50.0, 'quantidade': 1, 'sku': 'PROD02'}], 'pedido_numero': 123}}
         parametros = {}
         malote.monta_conteudo(self.pedido, parametros, dados)
-        malote.to_dict().should.be.equal({'amount': 14.0, 'card_token_id': 'zas', 'currency_id': 'BRL', 'customer': {'address': {'street_name': 'Rua Teste', 'street_number': 123, 'zip_code': '10234000'}, 'email': 'email@cliente.com', 'identification': {'number': '12345678901', 'type': 'CNPJ'}, 'phone': {'area_code': '11', 'number': '23456789'}, 'registration_date': '2013-05-01T10:20:00'}, 'external_reference': 123, 'installments': 1, 'items': [{'category_id': 'others', 'description': None, 'id': 'PROD01', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 1', 'unit_price': 40.0}, {'category_id': 'others', 'description': None, 'id': 'PROD02', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 2', 'unit_price': 50.0}], 'notification_url': 'http://localhost:5000/pagador/meio-pagamento/mptransparente/retorno/8/notificacao?referencia=123', 'payer_email': 'email@cliente.com', 'payment_method_id': 'visa', 'reason': 'Pagamento do pedido 123 na Loja Loja ZAS', 'shipments': {'cost': None, 'receiver_address': {'floor': None}}})
+        malote.to_dict().should.be.equal({'transaction_amount': 14.0, 'token': 'zas', 'payer': {'email': 'email@cliente.com', 'identification': {'number': '12345678901', 'type': 'CNPJ'}}, 'additional_info': {'items': [{'category_id': 'others', 'description': None, 'id': 'PROD01', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 1', 'unit_price': 40.0}, {'category_id': 'others', 'description': None, 'id': 'PROD02', 'picture_url': '', 'quantity': 1.0, 'title': 'Produto 2', 'unit_price': 50.0}], 'shipments': {'cost': None, 'receiver_address': {'floor': None}}, 'payer': {'address': {'street_name': 'Rua Teste', 'street_number': 123, 'zip_code': '10234000'}, 'phone': {'area_code': '11', 'number': '23456789'}, 'registration_date': '2013-05-01T10:20:00'}}, 'external_reference': 123, 'installments': 1, 'notification_url': 'http://localhost:5000/pagador/meio-pagamento/mptransparente/retorno/8/notificacao?referencia=123', 'payment_method_id': 'visa', 'description': 'Pagamento do pedido 123 na Loja Loja ZAS', 'binary_mode': False, 'statement_descriptor': None})
