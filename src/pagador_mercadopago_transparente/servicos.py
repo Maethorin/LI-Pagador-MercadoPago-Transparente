@@ -10,6 +10,7 @@ from pagador import configuracoes, servicos
 
 TEMPO_MAXIMO_ESPERA_NOTIFICACAO = 30
 GATEWAY = 'mptransparente'
+CODIGO_GATEWAY = 14
 
 
 URL_API_BASE = 'https://api.mercadopago.com'
@@ -228,6 +229,15 @@ class EntregaPagamento(servicos.EntregaPagamento):
         self.conexao.credenciador.configuracao = self.configuracao
         self.conexao.credenciador.atualiza_credenciais()
 
+    @property
+    def idempotencia(self):
+        return '{}_{}_{}_{}'.format(
+            self.loja_id,
+            self.pedido.numero,
+            CODIGO_GATEWAY,
+            self.formatador.formata_decimal(self.malote.transaction_amount, como_int=True)
+        )
+
     def envia_pagamento(self, tentativa=1):
         if self.pedido.situacao_id and self.pedido.situacao_id != servicos.SituacaoPedido.SITUACAO_PEDIDO_EFETUADO:
             self.resultado = {
@@ -245,7 +255,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
                     servicos.SituacaoPedido.mensagens_complementares(self.pedido.situacao_id)
                 )
             )
-        self.conexao.headers.update({'X-Idempotency-Key': '0000'})
+        self.conexao.headers.update({'X-Idempotency-Key': self.idempotencia})
         self.tentativa = tentativa
         if self.tentativa > 1:
             self.atualiza_credenciais()
@@ -293,15 +303,14 @@ class EntregaPagamento(servicos.EntregaPagamento):
 
     def define_dados_pagamento(self):
         self.dados_pagamento = {
-            # TODO: qual o novo ID que eu coloco aq!!!
-            'transacao_id': self.resposta.conteudo['payment_id'],
+            'transacao_id': self.resposta.conteudo['id'],
             'valor_pago': self.malote.amount,
             'conteudo_json': {
                 'bandeira': self.malote.payment_method_id,
                 'mensagem_retorno': MENSAGENS_RETORNO.get(self.resposta.conteudo.get('status_detail'), u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
             }
         }
-        self.identificacao_pagamento = self.resposta.conteudo['payment_id']
+        self.identificacao_pagamento = self.resposta.conteudo['id']
         self.dados_pagamento['conteudo_json'].update({
             'numero_parcelas': int(self.malote.installments),
             'valor_parcela': float(self.dados_cartao.get('valor_parcela', float(self.dados_pagamento['valor_pago'])))
