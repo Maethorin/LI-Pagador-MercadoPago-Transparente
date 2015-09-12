@@ -40,7 +40,7 @@ class Item(entidades.BaseParaPropriedade):
 
 
 class DadosEntrega(entidades.BaseParaPropriedade):
-    _atributos = ['cost', 'receiver_address']
+    _atributos = ['receiver_address']
 
 
 class EnderecoEntrega(entidades.BaseParaPropriedade):
