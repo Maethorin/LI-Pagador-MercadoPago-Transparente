@@ -166,6 +166,7 @@ MENSAGENS_RETORNO = {
     '3029': u'Mês da data de expiração inválido.',
     '3030': u'Ano da data de expiração inválido.',
     '4029': u'Não foi possível processar o pagamento com o e-mail cadastrado.',
+    '4033': u'O cartão escolhido não aceitou o parcelamento selecionado. Por favor tente de novo com outro cartão.',
     'accredited': u'Seu pagamento foi aprovado com sucesso.',
     'pending_contingency': u'Estamos processando o pagamento e em até 1 hora você será informado do resultado por e-mail.',
     'pending_review_manual': u'O pagamento está em análise e em até 2 dias úteis você será informado do resultado por e-mail.',
@@ -266,6 +267,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
         self.dados_enviados = {'tentativa': tentativa}
         self.dados_enviados.update(self.malote.to_dict())
         self.resposta = self.conexao.post(self.url, self.malote.to_dict())
+        servicos.logger.info(self.resposta.conteudo)
         if self.resposta.nao_autenticado or self.resposta.nao_autorizado:
             self.reenviar = self.tentativa < self.tentativa_maxima and (
                 self.resposta.conteudo.get('message', '') in ['expired_token', 'invalid_token'] or
@@ -291,24 +293,29 @@ class EntregaPagamento(servicos.EntregaPagamento):
             self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
         else:
             self.situacao_pedido = SituacoesDePagamento.do_tipo('rejected')
-            erros = [u'{}: {}'.format(causa['code'], MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
+            erros = [u'{}'.format(MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
             self.dados_pagamento = {
                 'conteudo_json': {
                     'mensagem_retorno': erros
                 }
             }
+            mensagem = u'Dados inválidos enviados ao MercadoPago'
+            if len(erros) > 0:
+                if u'Erro não identificado.' not in erros[0]:
+                    mensagem = erros[0]
             raise self.EnvioNaoRealizado(
-                u'Dados inválidos enviados ao MercadoPago',
+                mensagem,
                 self.loja_id,
                 self.pedido.numero,
                 dados_envio=self.malote.to_dict(),
-                erros=erros
+                erros=erros,
+                status=self.resposta.conteudo.get('status', 500)
             )
 
     def define_dados_pagamento(self):
         self.dados_pagamento = {
             'transacao_id': self.resposta.conteudo['id'],
-            'valor_pago': self.malote.amount,
+            'valor_pago': self.malote.transaction_amount,
             'conteudo_json': {
                 'bandeira': self.malote.payment_method_id,
                 'mensagem_retorno': MENSAGENS_RETORNO.get(self.resposta.conteudo.get('status_detail'), u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
