@@ -267,7 +267,6 @@ class EntregaPagamento(servicos.EntregaPagamento):
         self.dados_enviados = {'tentativa': tentativa}
         self.dados_enviados.update(self.malote.to_dict())
         self.resposta = self.conexao.post(self.url, self.malote.to_dict())
-        servicos.logger.info(self.resposta.conteudo)
         if self.resposta.nao_autenticado or self.resposta.nao_autorizado:
             self.reenviar = self.tentativa < self.tentativa_maxima and (
                 self.resposta.conteudo.get('message', '') in ['expired_token', 'invalid_token'] or
@@ -318,14 +317,12 @@ class EntregaPagamento(servicos.EntregaPagamento):
             'valor_pago': self.malote.transaction_amount,
             'conteudo_json': {
                 'bandeira': self.malote.payment_method_id,
-                'mensagem_retorno': MENSAGENS_RETORNO.get(self.resposta.conteudo.get('status_detail'), u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
+                'mensagem_retorno': MENSAGENS_RETORNO.get(self.resposta.conteudo.get('status_detail'), u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.'),
+                'numero_parcelas': int(self.malote.installments),
+                'valor_parcela': float(self.dados_cartao.get('valor_parcela', float(self.malote.transaction_amount)))
             }
         }
         self.identificacao_pagamento = self.resposta.conteudo['id']
-        self.dados_pagamento['conteudo_json'].update({
-            'numero_parcelas': int(self.malote.installments),
-            'valor_parcela': float(self.dados_cartao.get('valor_parcela', float(self.dados_pagamento['valor_pago'])))
-        })
 
     @property
     def dados_cartao(self):
@@ -360,29 +357,35 @@ DE_PARA_SITUACAO_MENSAGEM = {
 
 
 class Retorno(object):
-    pagamento = 'payment'
-    ordem_pagamento = 'merchant_order'
-
     def __init__(self, dados):
-        self.dados_retorno = {}
-        self.topico = dados.get('topic', None)
-        self.eh_pagamento = self.topico == self.pagamento
-        self.eh_ordem_pagamento = self.topico == self.ordem_pagamento
-        self.valido = 'id' in dados and 'topic' in dados and (self.eh_ordem_pagamento or self.eh_pagamento)
-        self.chave = 'collection' if self.eh_pagamento else 'payments'
+        tipo = dados.get('type', None)
+        eh_pagamento = tipo == 'payment'
+        self.valido = 'data' in dados and eh_pagamento
+        self.dados = {}
+        self.id = dados['data']['id']
+        self.valor_pago = None
+        self.metodo_pagamento = None
+        self.mensagem_retorno = None
+        self.numero_parcelas = None
+        self.valor_parcela = None
+        self.situacao_pedido = None
+        self.pedido_numero = None
 
     def recebe_dados_de_retorno(self, dados):
-        self.dados_retorno = dados
-
-    @property
-    def dados(self):
-        try:
-            if self.eh_pagamento:
-                return self.dados_retorno[self.chave]
-            if self.eh_ordem_pagamento:
-                    return self.dados_retorno[self.chave][0]
-        except (IndexError, KeyError):
-            return {}
+        self.dados = dados
+        self.valido = 'id' in dados
+        if not self.valido:
+            return
+        self.id = dados['id']
+        self.valor_pago = float(dados.get('transaction_amount', 0.0))
+        self.metodo_pagamento = dados.get('payment_method_id')
+        self.mensagem_retorno = MENSAGENS_RETORNO.get(dados.get('status_detail'), u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
+        self.numero_parcelas = int(dados.get('installments', 1))
+        self.valor_parcela = self.valor_pago
+        self.situacao_pedido = SituacoesDePagamento.do_tipo(dados.get('status', ''))
+        self.pedido_numero = dados['external_reference']
+        if 'transaction_details' in self.dados:
+            self.valor_parcela = self.dados['transaction_details'].get('installment_amount', self.valor_pago)
 
 
 class RegistraNotificacao(servicos.RegistraResultado):
@@ -393,24 +396,27 @@ class RegistraNotificacao(servicos.RegistraResultado):
         self.faz_http = True
         self.tentativa = 1
         self.tentativa_maxima = 2
+        self._url = '{}/v1/payments'.format(URL_API_BASE)
+
+    @property
+    def url(self):
+        return '{}/{}'.format(self._url, self.retorno.id)
 
     def define_credenciais(self):
         self.conexao.credenciador = Credenciador(configuracao=self.configuracao)
 
     def define_dados_pagamento(self):
         self.dados_pagamento = {
-            'transacao_id': self.retorno.dados['id'],
-            'valor_pago': self.retorno.dados.get('transaction_amount', self.retorno.dados.get('total_paid_amount', '0.0')),
+            'transacao_id': self.retorno.id,
+            'valor_pago': self.retorno.valor_pago,
             'conteudo_json': {
-                'bandeira': self.retorno.dados.get('payment_method_id'),
-                'mensagem_retorno': MENSAGENS_RETORNO.get(self.retorno.dados.get('status_detail'), u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
+                'bandeira': self.retorno.metodo_pagamento,
+                'mensagem_retorno': self.retorno.mensagem_retorno,
+                'numero_parcelas': self.retorno.numero_parcelas,
+                'valor_parcela': self.retorno.valor_parcela
             }
         }
-        self.identificacao_pagamento = self.retorno.dados['id']
-        self.dados_pagamento['conteudo_json'].update({
-            'numero_parcelas': int(self.retorno.dados.get('installments', 1)),
-            'valor_parcela': float(self.retorno.dados.get('installment_amount', float(self.dados_pagamento['valor_pago'])))
-        })
+        self.identificacao_pagamento = self.retorno.id
 
     def monta_dados_pagamento(self):
         if self.resposta and self.resposta.sucesso:
@@ -418,9 +424,9 @@ class RegistraNotificacao(servicos.RegistraResultado):
             if not self.retorno.valido:
                 self.resultado = {'resultado': 'erro', 'status_code': self.resposta.status_code, 'conteudo': self.resposta.conteudo}
                 return
-            self.pedido_numero = self.dados.get('referencia', None) or self.retorno.dados['external_reference']
+            self.pedido_numero = self.retorno.pedido_numero
             self.define_dados_pagamento()
-            self.situacao_pedido = SituacoesDePagamento.do_tipo(self.retorno.dados.get('status', ''))
+            self.situacao_pedido = self.retorno.situacao_pedido
             self.resultado = {'resultado': 'OK'}
         elif self.resposta and (self.resposta.nao_autenticado or self.resposta.nao_autorizado):
             self.reenviar = self.tentativa <= self.tentativa_maxima and (
@@ -452,15 +458,6 @@ class RegistraNotificacao(servicos.RegistraResultado):
         if self.tentativa > 1:
             self.atualiza_credenciais()
         self.resposta = self.conexao.get(self.url)
-
-    @property
-    def url(self):
-        if not self.retorno.valido:
-            return ''
-        if self.retorno.topico == Retorno.pagamento:
-            return 'https://api.mercadolibre.com/collections/notifications/{}'.format(self.dados['id'])
-        if self.retorno.topico == Retorno.ordem_pagamento:
-            return self.dados.get('resource', 'https://api.mercadolibre.com/merchant_orders/{}'.format(self.dados['id']))
 
 
 class AtualizaTransacoes(servicos.AtualizaTransacoes):
