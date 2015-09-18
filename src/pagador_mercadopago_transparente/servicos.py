@@ -59,7 +59,6 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         return {
             'code': self.dados['code'],
             'grant_type': TipoToken.authorization_code,
-            # 'client_id': self.client_id,
             'client_secret': self.client_secret,
             'redirect_uri': '{}?{}'.format(self.instalar_redirect_url, parametros_redirect)
         }
@@ -69,7 +68,6 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         return {
             'refresh_token': self.dados['codigo_autorizacao'],
             'grant_type': TipoToken.refresh_token,
-            # 'client_id': self.client_id,
             'client_secret': self.client_secret,
         }
 
