@@ -166,6 +166,7 @@ MENSAGENS_RETORNO = {
     '4029': u'Não foi possível processar o pagamento com o e-mail cadastrado.',
     '4033': u'O cartão escolhido não aceitou o parcelamento selecionado. Por favor tente de novo com outro cartão.',
     'accredited': u'Seu pagamento foi aprovado com sucesso.',
+    'refunded': u'O pagamento foi devolvido ao comprador.',
     'pending_contingency': u'Estamos processando o pagamento e em até 1 hora você será informado do resultado por e-mail.',
     'pending_review_manual': u'O pagamento está em análise e em até 2 dias úteis você será informado do resultado por e-mail.',
     'payer_unavailable': u'Seu pagamento não pode ser processado. Verifique seu cadastro junto ao MercadoPago através desse <a href="https://www.mercadopago.com.br/ajuda/contactForm?form_id=148" target="_blank">formulário</a> informando a situação e o código de erro: payer_unavailable.',
