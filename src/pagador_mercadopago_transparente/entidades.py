@@ -60,7 +60,6 @@ class Malote(entidades.Malote):
         self.token = None
         self.binary_mode = False
         self.statement_descriptor = None
-        # self.currency_id = 'BRL'
         self.notification_url = None
         self._pedido = None
 
@@ -102,7 +101,6 @@ class Malote(entidades.Malote):
         self.token = dados_pagamento['cartao']
         notification_url = configuracoes.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
         self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
-
 
     @property
     def _cliente_telefone(self):

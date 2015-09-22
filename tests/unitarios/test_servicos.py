@@ -157,8 +157,8 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.servico = mock.MagicMock()
         entregador.configuracao = mock.MagicMock(loja_id=8)
         entregador.pedido = mock.MagicMock(numero=123, valor_total=15.70, conteudo_json={'mptransparente': {'valor_parcela': 15.7}})
-        entregador.malote = mock.MagicMock(amount=15.70, payment_method_id='visa')
-        entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'payment_id': 'transacao-id', 'amount': 123.45, 'payment_method_id': 'visa'})
+        entregador.malote = mock.MagicMock(transaction_amount=15.70, payment_method_id='visa')
+        entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'id': 'transacao-id', 'transaction_amount': 123.45, 'payment_method_id': 'visa'})
         cria_pedido_mock.return_value = mock.MagicMock(situacao_id=9)
         entregador.processa_dados_pagamento()
         cria_pedido_mock.assert_called_with('Pedido', numero=123, loja_id=8)
@@ -183,7 +183,7 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
     def test_processar_dados_de_pagamento_dispara_erro_se_invalido(self):
         entregador = servicos.EntregaPagamento(8, dados={'passo': 'pre'})
         entregador.malote = mock.MagicMock()
-        entregador.malote.to_dict.return_value = {'card_hash': None, 'capture': 'false', 'amount': 2900, 'installments': 1, 'payment_method': 'credit_card'}
+        entregador.malote.to_dict.return_value = {'card_hash': None, 'capture': 'false', 'transaction_amount': 2900, 'installments': 1, 'payment_method': 'credit_card'}
         entregador.pedido = mock.MagicMock(numero=1234)
         entregador.resposta = mock.MagicMock(sucesso=False, requisicao_invalida=True, conteudo={u'url': u'/transactions', u'errors': [{u'message': u'Nome do portador do cartão está faltando', u'type': u'invalid_parameter', u'parameter_name': u'card_holder_name'}, {u'message': u'Data de expiração do cartão está faltando', u'type': u'invalid_parameter', u'parameter_name': u'card_expiration_date'}], u'method': u'post'})
         entregador.processa_dados_pagamento.when.called_with().should.throw(
@@ -195,7 +195,7 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
     def test_processar_dados_de_pagamento_dispara_erro_sem_ser_parameter(self):
         entregador = servicos.EntregaPagamento(8, dados={'passo': 'pre'})
         entregador.malote = mock.MagicMock()
-        entregador.malote.to_dict.return_value = {'card_hash': None, 'capture': 'false', 'amount': 2900, 'installments': 1, 'payment_method': 'credit_card'}
+        entregador.malote.to_dict.return_value = {'card_hash': None, 'capture': 'false', 'transaction_amount': 2900, 'installments': 1, 'payment_method': 'credit_card'}
         entregador.pedido = mock.MagicMock(numero=1234)
         entregador.resposta = mock.MagicMock(sucesso=False, requisicao_invalida=True, conteudo={u'url': u'/transactions', u'errors': [{u'message': u'Nome do portador do cartão está faltando', u'type': u'whatever'}, {u'message': u'Data de expiração do cartão está faltando', u'type': u'whatever'}], u'method': u'post'})
         entregador.processa_dados_pagamento.when.called_with().should.throw(
@@ -208,9 +208,9 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador = servicos.EntregaPagamento(1234, dados={'passo': 'pre'})
         entregador.configuracao = mock.MagicMock(aplicacao='test')
         entregador.pedido = mock.MagicMock(numero=123, valor_total=15.70, conteudo_json={'mptransparente': {'valor_parcela': 15.7}})
-        entregador.malote = mock.MagicMock(amount=15.70, payment_method_id='visa')
+        entregador.malote = mock.MagicMock(transaction_amount=15.70, payment_method_id='visa')
         entregador.servico = mock.MagicMock()
-        entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'payment_id': 'transacao-id', 'amount': 123.45, 'payment_method_id': 'visa'})
+        entregador.resposta = mock.MagicMock(sucesso=True, requisicao_invalida=False, conteudo={'status': 'approved', 'status_detail': 'accredited', 'id': 'transacao-id', 'transaction_amount': 123.45, 'payment_method_id': 'visa'})
         entregador.processa_dados_pagamento()
         entregador.identificacao_pagamento.should.be.equal('transacao-id')
 

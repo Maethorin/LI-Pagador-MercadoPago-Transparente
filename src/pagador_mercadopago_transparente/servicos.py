@@ -28,7 +28,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         super(InstalaMeioDePagamento, self).__init__(loja_id, dados)
         parametros = self.cria_entidade_pagador('ParametrosDeContrato', loja_id=loja_id).obter_para('mptransparente')
         self.client_id = parametros['client_id']
-        self.client_secret = parametros['client_secret']
+        self.client_access_token = parametros['client_access_token']
         headers = {
             'Accept': 'application/json',
         }
@@ -59,7 +59,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         return {
             'code': self.dados['code'],
             'grant_type': TipoToken.authorization_code,
-            'client_secret': self.client_secret,
+            'client_secret': self.client_access_token,
             'redirect_uri': '{}?{}'.format(self.instalar_redirect_url, parametros_redirect)
         }
 
@@ -68,7 +68,7 @@ class InstalaMeioDePagamento(servicos.InstalaMeioDePagamento):
         return {
             'refresh_token': self.dados['codigo_autorizacao'],
             'grant_type': TipoToken.refresh_token,
-            'client_secret': self.client_secret,
+            'client_secret': self.client_access_token,
         }
 
     def obter_dados(self):
