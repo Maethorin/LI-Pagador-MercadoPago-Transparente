@@ -101,6 +101,12 @@ class Malote(entidades.Malote):
         self.token = dados_pagamento['cartao']
         notification_url = configuracoes.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
         self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
+        try:
+            sponsor_id = int(parametros_contrato['sponsor_id'])
+        except (KeyError, ValueError):
+            sponsor_id = None
+        if sponsor_id:
+            setattr(self, 'sponsor_id', sponsor_id)
 
     @property
     def _cliente_telefone(self):
