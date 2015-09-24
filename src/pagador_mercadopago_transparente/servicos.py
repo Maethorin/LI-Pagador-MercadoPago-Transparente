@@ -11,6 +11,7 @@ from pagador import configuracoes, servicos
 TEMPO_MAXIMO_ESPERA_NOTIFICACAO = 30
 GATEWAY = 'mptransparente'
 CODIGO_GATEWAY = 14
+MENSAGEM_ERRO_PADRAO = u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.'
 
 
 URL_API_BASE = 'https://api.mercadopago.com'
@@ -246,7 +247,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
         if self.pedido.situacao_id and self.pedido.situacao_id != servicos.SituacaoPedido.SITUACAO_PEDIDO_EFETUADO:
             self.resultado = {
                 'resultado': DE_PARA_SITUACAO_STATUS.get(self.pedido.situacao_id, 'pending'),
-                'mensagem': DE_PARA_SITUACAO_MENSAGEM.get(self.pedido.situacao_id, u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.'),
+                'mensagem': DE_PARA_SITUACAO_MENSAGEM.get(self.pedido.situacao_id, MENSAGEM_ERRO_PADRAO),
                 'fatal': self.pedido.situacao_id == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO,
             }
             next_url = self.dados.get('next_url', None)
@@ -287,11 +288,14 @@ class EntregaPagamento(servicos.EntregaPagamento):
         if self.resposta.sucesso:
             self.define_dados_pagamento()
             self.situacao_pedido = SituacoesDePagamento.do_tipo(self.resposta.conteudo['status'])
-            mensagem_retorno = MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
+            mensagem_retorno = MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], MENSAGEM_ERRO_PADRAO)
             self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
         else:
             self.situacao_pedido = SituacoesDePagamento.do_tipo('rejected')
-            erros = [u'{}'.format(MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
+            if isinstance(self.resposta.conteudo, dict):
+                erros = [u'{}'.format(MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
+            else:
+                erros = MENSAGEM_ERRO_PADRAO
             self.dados_pagamento = {
                 'conteudo_json': {
                     'mensagem_retorno': erros
@@ -316,7 +320,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             'valor_pago': self.malote.transaction_amount,
             'conteudo_json': {
                 'bandeira': self.malote.payment_method_id,
-                'mensagem_retorno': MENSAGENS_RETORNO.get(self.resposta.conteudo.get('status_detail'), u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.'),
+                'mensagem_retorno': MENSAGENS_RETORNO.get(self.resposta.conteudo.get('status_detail'), MENSAGEM_ERRO_PADRAO),
                 'numero_parcelas': int(self.malote.installments),
                 'valor_parcela': float(self.dados_cartao.get('valor_parcela', float(self.malote.transaction_amount)))
             }
@@ -378,7 +382,7 @@ class Retorno(object):
         self.id = dados['id']
         self.valor_pago = float(dados.get('transaction_amount', 0.0))
         self.metodo_pagamento = dados.get('payment_method_id')
-        self.mensagem_retorno = MENSAGENS_RETORNO.get(dados.get('status_detail'), u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.')
+        self.mensagem_retorno = MENSAGENS_RETORNO.get(dados.get('status_detail'), MENSAGEM_ERRO_PADRAO)
         self.numero_parcelas = int(dados.get('installments', 1))
         self.valor_parcela = self.valor_pago
         self.situacao_pedido = SituacoesDePagamento.do_tipo(dados.get('status', ''))
