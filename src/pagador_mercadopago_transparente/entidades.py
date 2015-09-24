@@ -101,6 +101,7 @@ class Malote(entidades.Malote):
         self.token = dados_pagamento['cartao']
         notification_url = configuracoes.NOTIFICACAO_URL.format(GATEWAY, self.configuracao.loja_id)
         self.notification_url = '{}/notificacao?referencia={}'.format(notification_url, pedido.numero)
+        self.statement_descriptor = self.configuracao.informacao_complementar
         try:
             sponsor_id = int(parametros_contrato['sponsor_id'])
         except (KeyError, ValueError):
@@ -136,7 +137,7 @@ class Malote(entidades.Malote):
 class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
 
     def __init__(self, loja_id, codigo_pagamento=None, eh_listagem=False):
-        self.campos = ['usuario', 'token', 'token_expiracao', 'codigo_autorizacao', 'ativo', 'valor_minimo_aceitado', 'valor_minimo_parcela', 'mostrar_parcelamento', 'maximo_parcelas', 'parcelas_sem_juros']
+        self.campos = ['usuario', 'token', 'token_expiracao', 'codigo_autorizacao', 'ativo', 'informacao_complementar', 'valor_minimo_aceitado', 'valor_minimo_parcela', 'mostrar_parcelamento', 'maximo_parcelas', 'parcelas_sem_juros']
         self.codigo_gateway = CODIGO_GATEWAY
         self.eh_gateway = True
         super(ConfiguracaoMeioPagamento, self).__init__(loja_id, codigo_pagamento, eh_listagem=eh_listagem)

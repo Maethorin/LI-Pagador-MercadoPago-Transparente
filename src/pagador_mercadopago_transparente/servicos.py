@@ -267,6 +267,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
         self.dados_enviados = {'tentativa': tentativa}
         self.dados_enviados.update(self.malote.to_dict())
         self.resposta = self.conexao.post(self.url, self.malote.to_dict())
+        servicos.logger.info('\n\n\n\n{}\n\n\n\n'.format(self.resposta.conteudo))
         if self.resposta.nao_autenticado or self.resposta.nao_autorizado:
             self.reenviar = self.tentativa < self.tentativa_maxima and (
                 self.resposta.conteudo.get('message', '') in ['expired_token', 'invalid_token'] or
