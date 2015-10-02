@@ -33,7 +33,7 @@ def read(fname):
 
 setup(
     name='li-pagador-mercadopago-transparente',
-    version='1.2.8',
+    version='1.2.9',
     url='https://github.com/lojaintegrada/LI-Pagador-MercadoPago-Transparente',
     license='MIT',
     description='Meio de pagamento usando o checkout transparente do MercadoPago (http://developers.mercadopago.com/documentation/custom-checkout-advanced)',
