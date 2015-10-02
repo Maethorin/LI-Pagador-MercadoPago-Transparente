@@ -135,6 +135,9 @@ class Malote(entidades.Malote):
 
 
 class ConfiguracaoMeioPagamento(entidades.ConfiguracaoMeioPagamento):
+    modos_pagamento_aceitos = {
+        'cartoes': ['visa', 'mastercard', 'hipercard', 'amex', 'diners', 'elo'],
+    }
 
     def __init__(self, loja_id, codigo_pagamento=None, eh_listagem=False):
         self.campos = ['usuario', 'token', 'token_expiracao', 'codigo_autorizacao', 'ativo', 'informacao_complementar', 'valor_minimo_aceitado', 'valor_minimo_parcela', 'mostrar_parcelamento', 'maximo_parcelas', 'parcelas_sem_juros']
