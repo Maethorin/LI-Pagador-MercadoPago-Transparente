@@ -8,7 +8,7 @@ os.environ['API_URL'] = 'http://localhost:5000/'
 os.environ['CHAVE_API_PEDIDO'] = ''
 os.environ['CHAVE_API_PLATAFORMA'] = ''
 os.environ['PAGADOR_DEBUG'] = 'True'
-os.environ['PAGADOR_ENVIRONMENT'] = 'local'
+os.environ['ENVIRONMENT'] = 'local'
 os.environ['PAGADOR_CHAVE_APLICACAO'] = '2a35710a-b0a6-4807-ab3f-95f4e4551f45'
 
 os.environ['PAGADOR_REQUEST_BASE_TIMEOUT'] = '(15, 30)'
