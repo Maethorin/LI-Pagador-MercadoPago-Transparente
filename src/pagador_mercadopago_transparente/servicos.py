@@ -7,12 +7,10 @@ from li_common.comunicacao import requisicao
 
 from pagador import configuracoes, servicos
 
-
 TEMPO_MAXIMO_ESPERA_NOTIFICACAO = 30
 GATEWAY = 'mptransparente'
 CODIGO_GATEWAY = 14
 MENSAGEM_ERRO_PADRAO = u'O pagamento pelo cartão informado não foi processado. Por favor, tente outra forma de pagamento.'
-
 
 URL_API_BASE = 'https://api.mercadopago.com'
 
@@ -119,6 +117,7 @@ class Credenciador(servicos.Credenciador):
     def obter_credenciais(self):
         return self.access_token
 
+
 MENSAGENS_RETORNO = {
     '106': u'Você não pode fazer pagamentos para usuários em outros países.',
     '109': u'O seu cartão não aceita as parcelas selecionadas.',
@@ -221,10 +220,9 @@ class EntregaPagamento(servicos.EntregaPagamento):
         self.tem_malote = True
         self.faz_http = True
         self.conexao = self.obter_conexao()
-        self.conexao.tenta_outra_vez = False
+        # self.conexao.tenta_outra_vez = False
         self.url = '{}/v1/payments'.format(URL_API_BASE)
-        self.tentativa = 1
-        self.tentativa_maxima = 2
+        self.tentativa_maxima = 4
 
     def define_credenciais(self):
         self.conexao.credenciador = Credenciador(configuracao=self.configuracao)
@@ -244,7 +242,11 @@ class EntregaPagamento(servicos.EntregaPagamento):
         )
 
     def envia_pagamento(self, tentativa=1):
-        if self.pedido.situacao_id and self.pedido.situacao_id != servicos.SituacaoPedido.SITUACAO_PEDIDO_EFETUADO:
+        if self.pedido.situacao_id and self.pedido.situacao_id not in [
+                    servicos.SituacaoPedido.SITUACAO_PEDIDO_PENDENTE,
+                    servicos.SituacaoPedido.SITUACAO_AGUARDANDO_PAGTO,
+                    servicos.SituacaoPedido.SITUACAO_PEDIDO_EFETUADO
+                ]:
             self.resultado = {
                 'resultado': DE_PARA_SITUACAO_STATUS.get(self.pedido.situacao_id, 'pending'),
                 'mensagem': DE_PARA_SITUACAO_MENSAGEM.get(self.pedido.situacao_id, MENSAGEM_ERRO_PADRAO),
@@ -261,20 +263,28 @@ class EntregaPagamento(servicos.EntregaPagamento):
                 )
             )
         self.conexao.headers.update({'X-Idempotency-Key': self.idempotencia})
-        self.tentativa = tentativa
-        if self.tentativa > 1:
-            self.atualiza_credenciais()
+        self._enviando_pagamento(tentativa)
+
+    def _enviando_pagamento(self, tentativa):
         self.dados_enviados = {'tentativa': tentativa}
         self.dados_enviados.update(self.malote.to_dict())
         self.resposta = self.conexao.post(self.url, self.malote.to_dict())
-        servicos.logger.info('\n\n\n\n{}\n\n\n\n'.format(self.resposta.conteudo))
         if self.resposta.nao_autenticado or self.resposta.nao_autorizado:
-            self.reenviar = self.tentativa < self.tentativa_maxima and (
+            reenviar = tentativa <= self.tentativa_maxima and (
                 self.resposta.conteudo.get('message', '') in ['expired_token', 'invalid_token'] or
                 self.resposta.conteudo.get('error', '') == 'invalid_access_token'
             )
-            if self.reenviar:
-                raise self.EnvioNaoRealizado(u'Autenticação da loja com o MercadoPago Falhou. Tentou reenviar: {}'.format(('SIM' if self.reenviar else u'NÃO')), self.loja_id, self.pedido.numero)
+            if reenviar:
+                tentativa += 1
+                self.atualiza_credenciais()
+                self._enviando_pagamento(tentativa)
+        if self.resposta.requisicao_invalida:
+            reenviar = tentativa <= self.tentativa_maxima and (
+                self.resposta.conteudo.get('message', '') == 'Invalid card token'
+            )
+            if reenviar:
+                tentativa += 1
+                self._enviando_pagamento(tentativa)
 
     def processa_dados_pagamento(self):
         tempo_espera = TEMPO_MAXIMO_ESPERA_NOTIFICACAO
@@ -351,7 +361,6 @@ DE_PARA_SITUACAO_STATUS = {
     servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE: 'pending',
     servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO: 'rejected'
 }
-
 
 DE_PARA_SITUACAO_MENSAGEM = {
     servicos.SituacaoPedido.SITUACAO_PEDIDO_PAGO: 'Seu pagamento foi aprovado.',

@@ -94,6 +94,86 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.resposta.should.be.equal(resposta_mock)
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    def test_deve_enviar_pagamento_se_pedido_esta_pendente(self):
+        entregador = servicos.EntregaPagamento(1234)
+        entregador.malote = mock.MagicMock()
+        entregador.malote.to_dict.return_value = {'zas': 'malote-como-dicionario'}
+        entregador.conexao = mock.MagicMock()
+        entregador.pedido = mock.MagicMock(numero=1234, situacao_id=1)
+        entregador.dados = {'next_url': 'zas'}
+        resposta_mock = mock.MagicMock(nao_autorizado=False, nao_autenticado=False)
+        entregador.conexao.post.return_value = resposta_mock
+        entregador.envia_pagamento()
+        entregador.dados_enviados.should.be.equal({'tentativa': 1, 'zas': 'malote-como-dicionario'})
+        entregador.resposta.should.be.equal(resposta_mock)
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    def test_deve_enviar_pagamento_se_pedido_esta_aguardando(self):
+        entregador = servicos.EntregaPagamento(1234)
+        entregador.malote = mock.MagicMock()
+        entregador.malote.to_dict.return_value = {'zas': 'malote-como-dicionario'}
+        entregador.conexao = mock.MagicMock()
+        entregador.pedido = mock.MagicMock(numero=1234, situacao_id=2)
+        entregador.dados = {'next_url': 'zas'}
+        resposta_mock = mock.MagicMock(nao_autorizado=False, nao_autenticado=False)
+        entregador.conexao.post.return_value = resposta_mock
+        entregador.envia_pagamento()
+        entregador.dados_enviados.should.be.equal({'tentativa': 1, 'zas': 'malote-como-dicionario'})
+        entregador.resposta.should.be.equal(resposta_mock)
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    def test_deve_enviar_pagamento_se_pedido_esta_efetuado(self):
+        entregador = servicos.EntregaPagamento(1234)
+        entregador.malote = mock.MagicMock()
+        entregador.malote.to_dict.return_value = {'zas': 'malote-como-dicionario'}
+        entregador.conexao = mock.MagicMock()
+        entregador.pedido = mock.MagicMock(numero=1234, situacao_id=9)
+        entregador.dados = {'next_url': 'zas'}
+        resposta_mock = mock.MagicMock(nao_autorizado=False, nao_autenticado=False)
+        entregador.conexao.post.return_value = resposta_mock
+        entregador.envia_pagamento()
+        entregador.dados_enviados.should.be.equal({'tentativa': 1, 'zas': 'malote-como-dicionario'})
+        entregador.resposta.should.be.equal(resposta_mock)
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
+    def test_deve_enviar_pagamento_se_der_erro_de_token(self):
+        entregador = servicos.EntregaPagamento(1234)
+        entregador.malote = mock.MagicMock()
+        entregador.malote.to_dict.return_value = {'zas': 'malote-como-dicionario'}
+        entregador.conexao = mock.MagicMock()
+        entregador.pedido = mock.MagicMock(situacao_id=None)
+        entregador.dados = {'next_url': 'zas'}
+        resposta_bad = mock.MagicMock(
+            nao_autorizado=False,
+            nao_autenticado=False,
+            sucesso=False,
+            requisicao_invalida=True,
+            conteudo={
+                "status": 400,
+                "message": "Invalid card token",
+                "cause": [{
+                    "code": 2062,
+                    "data": None,
+                    "description": "Invalid card token"
+                }],
+                "error": "bad_request"
+            }
+        )
+        resposta_ok = mock.MagicMock(
+            sucesso=True,
+            requisicao_invalida=False,
+            nao_autorizado=False,
+            nao_autenticado=False,
+            conteudo={
+                "status": 200
+            }
+        )
+        entregador.conexao.post.side_effect = [resposta_bad, resposta_ok]
+        entregador.envia_pagamento()
+        entregador.dados_enviados.should.be.equal({'tentativa': 2, 'zas': 'malote-como-dicionario'})
+
+
+    @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.atualiza_credenciais', mock.MagicMock())
     def test_deve_reenviar_pagamento_se_tentativa_eh_um(self):
         entregador = servicos.EntregaPagamento(1234)
@@ -102,11 +182,11 @@ class MPTransparenteEntregaPagamento(unittest.TestCase):
         entregador.conexao = mock.MagicMock()
         entregador.pedido = mock.MagicMock(situacao_id=None)
         entregador.dados = {'next_url': 'zas'}
-        resposta_mock = mock.MagicMock(nao_autorizado=True, nao_autenticado=False, conteudo={'message': 'invalid_token'})
-        entregador.conexao.post.return_value = resposta_mock
-        entregador.envia_pagamento.when.called_with().should.throw(
-            entregador.EnvioNaoRealizado
-        )
+        resposta_not_autorized = mock.MagicMock(nao_autorizado=True, nao_autenticado=False, conteudo={'message': 'invalid_token'})
+        resposta_ok = mock.MagicMock(sucesso=True, nao_autorizado=False, nao_autenticado=False, conteudo={})
+        entregador.conexao.post.side_effect = [resposta_not_autorized, resposta_ok]
+        entregador.envia_pagamento()
+        entregador.dados_enviados.should.be.equal({'tentativa': 2, 'zas': 'malote-como-dicionario'})
 
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.obter_conexao', mock.MagicMock())
     @mock.patch('pagador_mercadopago_transparente.servicos.EntregaPagamento.atualiza_credenciais', mock.MagicMock())
