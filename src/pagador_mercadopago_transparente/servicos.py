@@ -292,7 +292,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             pedido = self.cria_entidade_pagador('Pedido', numero=self.pedido.numero, loja_id=self.configuracao.loja_id)
             if pedido.situacao_id not in [servicos.SituacaoPedido.SITUACAO_PEDIDO_EFETUADO]:
                 self.situacao_pedido = None
-                self.resultado = {'resultado': 'alterado_por_notificacao', 'mensagem': '', 'fatal': pedido.situacao_id == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
+                self.resultado = {'resultado': 'alterado_por_notificacao', 'mensagem': '', 'fatal': pedido.situacao_id == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO, 'pago': self.situacao_pedido in [servicos.SituacaoPedido.SITUACAO_PEDIDO_PAGO, servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE]}
                 return
             sleep(1)
             tempo_espera -= 1
@@ -300,7 +300,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             self.define_dados_pagamento()
             self.situacao_pedido = SituacoesDePagamento.do_tipo(self.resposta.conteudo['status'])
             mensagem_retorno = MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], MENSAGEM_ERRO_PADRAO)
-            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO}
+            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO, 'pago': self.situacao_pedido in [servicos.SituacaoPedido.SITUACAO_PEDIDO_PAGO, servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE]}
         else:
             self.situacao_pedido = SituacoesDePagamento.do_tipo('rejected')
             if isinstance(self.resposta.conteudo, dict):
@@ -316,6 +316,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             if len(erros) > 0:
                 if u'Erro não identificado.' not in erros[0]:
                     mensagem = erros[0]
+            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem, 'fatal': False, 'pago': False}
             raise self.EnvioNaoRealizado(
                 mensagem,
                 self.loja_id,
