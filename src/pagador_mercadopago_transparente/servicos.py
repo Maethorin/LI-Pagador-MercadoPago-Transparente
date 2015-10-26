@@ -302,7 +302,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             mensagem_retorno = MENSAGENS_RETORNO.get(self.resposta.conteudo['status_detail'], MENSAGEM_ERRO_PADRAO)
             self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem_retorno, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO, 'pago': self.situacao_pedido in [servicos.SituacaoPedido.SITUACAO_PEDIDO_PAGO, servicos.SituacaoPedido.SITUACAO_PAGTO_EM_ANALISE]}
         else:
-            self.situacao_pedido = SituacoesDePagamento.do_tipo('rejected')
+            self.situacao_pedido = servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO if self.resposta.requisicao_invalida else servicos.SituacaoPedido.SITUACAO_AGUARDANDO_PAGTO
             if isinstance(self.resposta.conteudo, dict):
                 erros = [u'{}'.format(MENSAGENS_RETORNO.get(str(causa['code']), causa.get('description', u'Erro não identificado.'))) for causa in self.resposta.conteudo.get('cause', [])]
             else:
@@ -316,7 +316,7 @@ class EntregaPagamento(servicos.EntregaPagamento):
             if len(erros) > 0:
                 if u'Erro não identificado.' not in erros[0]:
                     mensagem = erros[0]
-            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem, 'fatal': False, 'pago': False}
+            self.resultado = {'resultado': self.resposta.conteudo['status'], 'mensagem': mensagem, 'fatal': self.situacao_pedido == servicos.SituacaoPedido.SITUACAO_PEDIDO_CANCELADO, 'pago': False}
             raise self.EnvioNaoRealizado(
                 mensagem,
                 self.loja_id,
