@@ -165,6 +165,7 @@ MENSAGENS_RETORNO = {
     '3030': u'Ano da data de expiração inválido.',
     '4029': u'Não foi possível processar o pagamento com o e-mail cadastrado.',
     '4033': u'O cartão escolhido não aceitou o parcelamento selecionado. Por favor tente de novo com outro cartão.',
+    '4037': u'O cartão escolhido não aceitou o parcelamento selecionado. Por favor tente de novo com outro cartão.',
     'accredited': u'Seu pagamento foi aprovado com sucesso.',
     'refunded': u'O pagamento foi devolvido ao comprador.',
     'pending_contingency': u'Estamos processando o pagamento e em até 1 hora você será informado do resultado por e-mail.',
